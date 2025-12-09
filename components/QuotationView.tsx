@@ -144,7 +144,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
             
             {/* Left: The Visual */}
             <motion.div variants={itemVariants} className="relative order-2 lg:order-1">
-                <div className="relative w-full aspect-square max-w-2xl mx-auto">
+                <div className="relative w-full aspect-square max-w-2xl mx-auto p-8">
                     {/* Decorative Ring */}
                     <div className="absolute inset-0 border border-[#222] rounded-full opacity-20 scale-110" />
                     <div className="absolute inset-0 border border-dashed border-[#333] rounded-full opacity-20 scale-125 animate-spin-slow duration-[60s]" />
@@ -165,7 +165,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 </div>
                 
                  {/* Technical Overlay Label */}
-                 <div className="absolute bottom-0 left-0 bg-[#161616] border border-[#333] p-4 max-w-xs">
+                 <div className="absolute bottom-4 left-4 bg-[#161616]/90 backdrop-blur-md border border-[#333] p-4 max-w-xs z-20 rounded-sm">
                     <div className="text-[10px] text-[#666] uppercase font-mono mb-1">Spec.</div>
                     <div className="text-xs font-mono text-[#EDEDED]">10.5J x 23" | ET20</div>
                     <div className="text-xs font-mono text-[#D4F846] mt-1">FORGED ALUMINUM 6061-T6</div>
