@@ -15,15 +15,10 @@ async function getQuotation(offerteId: string | undefined): Promise<Quotation | 
     return null;
   }
 
-  const url = `${base.replace(/\/$/, "")}/webhook/offerte`;
+  const url = `${base.replace(/\/$/, "")}/webhook/offerte?offerte_id=${encodeURIComponent(offerteId)}`;
 
   try {
-    const res = await fetch(url, {
-      method: "POST",
-      cache: "no-store",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ offerte_id: offerteId }),
-    });
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) {
       console.error("Fetch failed", res.status, res.statusText);
       return null;
