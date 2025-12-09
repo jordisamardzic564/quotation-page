@@ -79,12 +79,33 @@ const Separator = () => (
 );
 
 export default function QuotationView({ data }: QuotationViewProps) {
-  const { mainProduct, otherProducts } = useMemo(() => {
-    const main = data.producten[0];
-    const others = data.producten.slice(1);
-    return { mainProduct: main, otherProducts: others };
+  const { wheelProducts, accessoryProducts } = useMemo(() => {
+    // Identify wheel products based on having a size property and likely being in the first positions
+    // We filter out items that might have a size but are clearly accessories (like bolts if they had sizes)
+    // For now, assuming any product with a "J x" or similar size pattern or just being the first items with size.
+    const wheels = data.producten.filter(
+      (p) =>
+        p.size &&
+        (p.size.includes("x") || p.size.includes("X")) &&
+        !p.product_naam.toLowerCase().includes("bout")
+    );
+
+    if (wheels.length === 0 && data.producten.length > 0) {
+      return {
+        wheelProducts: [data.producten[0]],
+        accessoryProducts: data.producten.slice(1),
+      };
+    }
+
+    const wheelIds = new Set(wheels.map((w) => w.product_id));
+    const accessories = data.producten.filter(
+      (p) => !wheelIds.has(p.product_id)
+    );
+
+    return { wheelProducts: wheels, accessoryProducts: accessories };
   }, [data.producten]);
 
+  const mainProduct = wheelProducts[0];
   const parsedMainProduct = parseProduct(mainProduct);
 
   return (
@@ -167,8 +188,26 @@ export default function QuotationView({ data }: QuotationViewProps) {
                  {/* Technical Overlay Label */}
                  <div className="absolute bottom-4 left-4 bg-[#161616]/90 backdrop-blur-md border border-[#333] p-4 max-w-xs z-20 rounded-sm">
                     <div className="text-[10px] text-[#666] uppercase font-mono mb-1">Spec.</div>
-                    <div className="text-xs font-mono text-[#EDEDED]">10.5J x 23" | ET20</div>
-                    <div className="text-xs font-mono text-[#D4F846] mt-1">FORGED ALUMINUM 6061-T6</div>
+                    {wheelProducts.map((wheel, i) => {
+                      const parsed = parseProduct(wheel);
+                      // Try to extract ET value from description or title if not in size
+                      // Assuming size is like "10.5J x 23" and doesn't contain ET
+                      // If size already contains ET, we might duplicate it, so careful.
+                      // Regex to find ET value: ET20, ET 20, et20
+                      const etMatch =
+                        parsed.description.match(/ET\s*-?\d+/i) ||
+                        parsed.title.match(/ET\s*-?\d+/i);
+                      const etDisplay = etMatch
+                        ? `| ${etMatch[0].toUpperCase().replace(/\s+/, "")}`
+                        : "";
+
+                      return (
+                        <div key={i} className="text-xs font-mono text-[#EDEDED]">
+                          {wheel.size} {etDisplay}
+                        </div>
+                      );
+                    })}
+                    <div className="text-xs font-mono text-[#D4F846] mt-1">FORGED ALUMINUM 6061-T7</div>
                  </div>
              </motion.div>
 
@@ -243,40 +282,54 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     <div className="col-span-2 text-right">Value</div>
                 </div>
 
-                {/* Main Product Row */}
-                <motion.div 
-                    variants={itemVariants}
-                    className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-8 border-b border-[#333] hover:border-[#D4F846] transition-colors relative"
-                >
-                     {/* Hover Glow */}
-                    <div className="absolute inset-0 bg-[#D4F846] opacity-0 group-hover:opacity-[0.02] transition-opacity pointer-events-none" />
+                {/* Main Product Rows (Wheels) */}
+                {wheelProducts.map((wheel) => {
+                  const parsed = parseProduct(wheel);
+                  return (
+                    <motion.div
+                      key={wheel.product_id}
+                      variants={itemVariants}
+                      className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-8 border-b border-[#333] hover:border-[#D4F846] transition-colors relative"
+                    >
+                      {/* Hover Glow */}
+                      <div className="absolute inset-0 bg-[#D4F846] opacity-0 group-hover:opacity-[0.02] transition-opacity pointer-events-none" />
 
-                    <div className="col-span-12 md:col-span-2 font-mono text-[#D4F846] text-xs">
-                        {parsedMainProduct.code || 'WHEEL-SET'}
-                    </div>
-                    <div className="col-span-12 md:col-span-6">
+                      <div className="col-span-12 md:col-span-2 font-mono text-[#D4F846] text-xs">
+                        {parsed.code || "WHEEL-SET"}
+                      </div>
+                      <div className="col-span-12 md:col-span-6">
                         <h3
                           className="text-xl font-bold uppercase mb-2"
-                          style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
+                          style={{
+                            fontFamily: "Ppmonumentextended, sans-serif",
+                          }}
                         >
-                          {parsedMainProduct.title}
+                          {parsed.title}
                         </h3>
-                        <p className="text-[#888] text-sm leading-relaxed">{parsedMainProduct.description}</p>
+                        <p className="text-[#888] text-sm leading-relaxed">
+                          {parsed.description}
+                        </p>
                         <div className="flex gap-4 mt-4">
-                             <span className="text-xs font-mono bg-[#111] px-2 py-1 border border-[#222] text-[#AAA]">{mainProduct.size}</span>
-                             <span className="text-xs font-mono bg-[#111] px-2 py-1 border border-[#222] text-[#AAA]">5x112</span>
+                          <span className="text-xs font-mono bg-[#111] px-2 py-1 border border-[#222] text-[#AAA]">
+                            {wheel.size}
+                          </span>
+                          <span className="text-xs font-mono bg-[#111] px-2 py-1 border border-[#222] text-[#AAA]">
+                            5x112
+                          </span>
                         </div>
-                    </div>
-                    <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] flex items-start justify-end">
-                        {mainProduct.quantity}
-                    </div>
-                    <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] text-lg">
-                        {formatCurrency(mainProduct.prijs_per_stuk, data.valuta)}
-                    </div>
-                </motion.div>
+                      </div>
+                      <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] flex items-start justify-end">
+                        {wheel.quantity}
+                      </div>
+                      <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] text-lg">
+                        {formatCurrency(wheel.prijs_per_stuk, data.valuta)}
+                      </div>
+                    </motion.div>
+                  );
+                })}
 
                 {/* Other Products Rows */}
-                {otherProducts.map((product) => {
+                {accessoryProducts.map((product) => {
                     const parsed = parseProduct(product);
                     const isIncluded = product.prijs_per_stuk === 0;
 
