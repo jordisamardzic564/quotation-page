@@ -1,7 +1,27 @@
 import QuotationView from "@/components/QuotationView";
 import { Quotation } from "@/types/quotation";
+import { headers } from "next/headers";
 
 export const dynamic = "force-dynamic";
+
+function getOfferteIdFallback(): string | undefined {
+  const h = headers();
+  const raw =
+    h.get("x-vercel-forwarded-url") ||
+    h.get("x-original-url") ||
+    h.get("referer") ||
+    "";
+
+  try {
+    const u = new URL(raw);
+    const parts = u.pathname.split("/").filter(Boolean);
+    const idx = parts.indexOf("offerte");
+    if (idx >= 0 && parts[idx + 1]) return parts[idx + 1];
+  } catch {
+    // ignore parse errors
+  }
+  return undefined;
+}
 
 async function getQuotation(offerteId: string | undefined): Promise<Quotation | null> {
   if (!offerteId) {
@@ -18,6 +38,7 @@ async function getQuotation(offerteId: string | undefined): Promise<Quotation | 
   const url = `${base.replace(/\/$/, "")}/webhook/offerte?offerte_id=${encodeURIComponent(offerteId)}`;
 
   try {
+    console.log("Fetching offerte", { offerteId, url });
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) {
       console.error("Fetch failed", res.status, res.statusText);
@@ -57,7 +78,8 @@ export default async function OffertePage({
   params: { offerte_id?: string };
   searchParams?: { offerte_id?: string };
 }) {
-  const offerteId = params?.offerte_id || searchParams?.offerte_id;
+  const offerteId =
+    params?.offerte_id || searchParams?.offerte_id || getOfferteIdFallback();
   const quotation = await getQuotation(offerteId);
 
   if (!quotation) {
