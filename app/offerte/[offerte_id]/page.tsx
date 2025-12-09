@@ -6,21 +6,26 @@ export const dynamic = "force-dynamic";
 async function getQuotation(offerteId: string): Promise<Quotation | null> {
   const base = process.env.N8N_BASE_URL;
   if (!base) {
-    throw new Error("N8N_BASE_URL is not set");
-  }
-
-  const url = `${base.replace(/\/$/, "")}/webhook/offerte?offerte_id=${encodeURIComponent(offerteId)}`;
-  const res = await fetch(url, { cache: "no-store" });
-
-  if (!res.ok) {
+    console.error("N8N_BASE_URL is not set");
     return null;
   }
 
-  const data = await res.json();
-  const item = Array.isArray(data) ? data[0]?.json : data?.json || data;
-  if (!item) return null;
+  const url = `${base.replace(/\/$/, "")}/webhook/offerte?offerte_id=${encodeURIComponent(offerteId)}`;
 
-  return item as Quotation;
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) {
+      console.error("Fetch failed", res.status, res.statusText);
+      return null;
+    }
+    const data = await res.json();
+    const item = Array.isArray(data) ? data[0]?.json : data?.json || data;
+    if (!item) return null;
+    return item as Quotation;
+  } catch (err) {
+    console.error("Fetch error", err);
+    return null;
+  }
 }
 
 export default async function OffertePage({
