@@ -61,7 +61,8 @@ async function getQuotation(offerteId: string | undefined): Promise<Quotation | 
       return null;
     }
 
-    const item = Array.isArray(data) ? data[0]?.json : data?.json || data;
+    const first = Array.isArray(data) ? data[0] : data;
+    const item = first?.json || first;
     if (!item) {
       console.error("No item in n8n response", data);
       return null;
