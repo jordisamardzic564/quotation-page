@@ -4,11 +4,13 @@ import { headers } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
-function getOfferteIdFallback(): string | undefined {
-  const h = headers();
+async function getOfferteIdFallback(): Promise<string | undefined> {
+  const h = await headers();
   const raw =
     h.get("x-vercel-forwarded-url") ||
     h.get("x-original-url") ||
+    h.get("x-forwarded-path") ||
+    h.get("next-url") ||
     h.get("referer") ||
     "";
 
@@ -75,11 +77,37 @@ export default async function OffertePage({
   params,
   searchParams,
 }: {
-  params: { offerte_id?: string };
-  searchParams?: { offerte_id?: string };
+  params: Promise<{ offerte_id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+
   const offerteId =
-    params?.offerte_id || searchParams?.offerte_id || getOfferteIdFallback();
+    resolvedParams.offerte_id ||
+    (typeof resolvedSearchParams?.offerte_id === "string"
+      ? resolvedSearchParams.offerte_id
+      : undefined) ||
+    (await getOfferteIdFallback());
+
+  // Debug logging to trace missing params in Vercel
+  try {
+    const headerEntries = Object.fromEntries((await headers()).entries());
+    console.log("Offerte request debug", {
+      params: resolvedParams,
+      searchParams: resolvedSearchParams,
+      headerSamples: {
+        "x-vercel-forwarded-url": headerEntries["x-vercel-forwarded-url"],
+        "x-original-url": headerEntries["x-original-url"],
+        "x-forwarded-path": headerEntries["x-forwarded-path"],
+        "next-url": headerEntries["next-url"],
+        referer: headerEntries["referer"],
+      },
+    });
+  } catch (e) {
+    console.log("Header debug failed", e);
+  }
+
   const quotation = await getQuotation(offerteId);
 
   if (!quotation) {
