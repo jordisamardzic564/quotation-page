@@ -80,29 +80,24 @@ const Separator = () => (
 
 export default function QuotationView({ data }: QuotationViewProps) {
   const { wheelProducts, accessoryProducts } = useMemo(() => {
-    // Identify wheel products based on having a size property and likely being in the first positions
-    // We filter out items that might have a size but are clearly accessories (like bolts if they had sizes)
-    // For now, assuming any product with a "J x" or similar size pattern or just being the first items with size.
-    const wheels = data.producten.filter(
-      (p) =>
-        p.size &&
-        (p.size.includes("x") || p.size.includes("X")) &&
-        !p.product_naam.toLowerCase().includes("bout")
-    );
+    const wheels: Product[] = [];
+    const others: Product[] = [];
 
-    if (wheels.length === 0 && data.producten.length > 0) {
-      return {
-        wheelProducts: [data.producten[0]],
-        accessoryProducts: data.producten.slice(1),
-      };
-    }
+    data.producten.forEach((p, i) => {
+      // Logic:
+      // 1. First item is always a main wheel product.
+      // 2. Second item is a main wheel product ONLY if it has a 'size' property (indicating a staggered setup/breedset).
+      // 3. Everything else is an accessory.
+      if (i === 0) {
+        wheels.push(p);
+      } else if (i === 1 && p.size && p.size.trim().length > 0) {
+        wheels.push(p);
+      } else {
+        others.push(p);
+      }
+    });
 
-    const wheelIds = new Set(wheels.map((w) => w.product_id));
-    const accessories = data.producten.filter(
-      (p) => !wheelIds.has(p.product_id)
-    );
-
-    return { wheelProducts: wheels, accessoryProducts: accessories };
+    return { wheelProducts: wheels, accessoryProducts: others };
   }, [data.producten]);
 
   const mainProduct = wheelProducts[0];
