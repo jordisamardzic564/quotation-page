@@ -1,26 +1,102 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-extended: var(--font-unbounded), sans-serif;
+  --font-inconsolata: var(--font-inconsolata), monospace;
+  --font-lato: var(--font-lato), sans-serif;
+  
+  --color-neon-lime: #D4F846;
+  --color-deep-black: #000000;
+  --color-bg-hero: #161616;
+  --color-muted-text: #666666;
+}
+
+@font-face {
+  font-family: 'Ppmonumentextended';
+  src: url('https://fonts.cdnfonts.com/s/19448/PPMonumentExtended-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #161616; /* Matches .bg-section.hero */
+  --foreground: #EDEDED;
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--background);
+  font-family: var(--font-sans);
+  /* Verwijder de global grid/gradient background, deze staat niet in de webflow styling */
+  background-image: none;
+  position: relative;
+}
+
+/* Subtle grid overlay - VEEL subtieler maken, of weghalen als het niet past */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, #333 1px, transparent 1px),
+    linear-gradient(to bottom, #333 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-position: center top;
+  opacity: 0.05; /* Heel subtiel, nauwelijks zichtbaar */
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Radial Glow - Verwijderd, dit gaf de "grijze waas" */
+body::after {
+  display: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #161616;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 0px; 
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D4F846;
+}
+
+.blend-multiply {
+  mix-blend-mode: multiply;
+}
+
+/* Specific heading override as requested */
+h1, h2, h3, .heading-extended {
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-family: 'Ppmonumentextended', sans-serif;
+  font-weight: 400;
+}
+
+/* Paragraphs use Inconsolata monospace */
+p {
+  font-family: var(--font-inconsolata), monospace;
+}
+
+/* Buttons and button-like links use Lato uppercase, 12px */
+button,
+a[role="button"],
+.btn,
+.button,
+.cta-button {
+  font-family: var(--font-lato), sans-serif;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 2px;
+  border-radius: 6px;
 }
