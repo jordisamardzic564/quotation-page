@@ -116,14 +116,13 @@ export default function QuotationView({ data }: QuotationViewProps) {
   const [showIntro, setShowIntro] = useState(true);
 
   // Intro tekst bepalen
-  const introText = `Quotation ${data.offerte_id} personally curated for ${data.klant_naam}`;
+  const introText = `Quotation ${data.offerte_id} personally curated for\n${data.klant_naam}`;
 
   useEffect(() => {
-    // Totale duur iets langer maken zodat de animatie rustig kan afspelen + leestijd
-    // Bijv: 3 seconden lezen + 1 seconde animatie
+    // Totale duur: animatie (2.5s) + delay (1s) = 3.5s
     const timer = setTimeout(() => {
       setShowIntro(false);
-    }, 3000);
+    }, 3500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -430,7 +429,60 @@ export default function QuotationView({ data }: QuotationViewProps) {
         </section>
 
 
-        {/* Premium 4-Step Process */}
+        {/* Conversion / Payment Section - NU EERST */}
+        <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-[#333] pt-12 mb-32">
+            
+            <div className="lg:col-span-6">
+                <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Production Slot</h3>
+                <p className="text-[#888] max-w-lg mb-8">
+                    Your configuration is ready for production scheduling. 
+                    Due to high demand for the {mainProduct.size} raw forgings, we require a deposit to secure your allocation in the milling queue.
+                </p>
+                <div className="flex items-center gap-4 text-xs font-mono text-[#666]">
+                    <div className="flex items-center gap-2">
+                        <Lock className="w-3 h-3" />
+                        <span>256-BIT ENCRYPTED</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-3 h-3" />
+                        <span>BUYER PROTECTION</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="lg:col-span-6 bg-[#111] border border-[#333] p-8 lg:p-12 relative overflow-hidden">
+                {/* Background Grid inside card */}
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none" />
+                
+                <div className="relative z-10">
+                    <div className="flex justify-between items-end mb-4">
+                        <span className="text-[#666] font-mono uppercase text-sm">Total Value (Excl. VAT)</span>
+                        <span className="text-2xl font-mono text-[#EDEDED] decoration-slice decoration-1 underline decoration-[#333] underline-offset-4">
+                            {formatCurrency(data.totaal_excl, data.valuta)}
+                        </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-end mb-12">
+                        <span className="text-[#D4F846] font-mono uppercase text-sm font-bold">Deposit Required</span>
+                        <span className="text-5xl md:text-6xl font-extended text-[#D4F846] tracking-tighter">
+                            {formatCurrency(data.aanbetaling, data.valuta)}
+                        </span>
+                    </div>
+
+                    <button className="w-full bg-[#D4F846] text-black font-bold uppercase font-extended tracking-widest py-6 hover:bg-white transition-all transform active:scale-[0.99] flex items-center justify-center gap-4 group">
+                        Secure Allocation 
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                    
+                    <p className="text-center mt-6 text-[#444] text-[10px] font-mono uppercase">
+                        By proceeding you accept our engineering terms & conditions.
+                    </p>
+                </div>
+            </div>
+
+        </section>
+
+        {/* Premium 4-Step Process - VERPLAATST NAAR ONDER */}
         <section className="mb-32">
              <div className="mb-12 border-b border-[#333] pb-4">
                 <h2 className="uppercase tracking-wide" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Premium 4-Step Process</h2>
@@ -483,7 +535,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
         </section>
 
 
-        {/* Technical FAQ Section */}
+        {/* Technical FAQ Section - OOK VERPLAATST NAAR ONDER */}
         <section className="mb-32 border-t border-[#333] pt-12">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <div className="lg:col-span-4">
@@ -532,60 +584,6 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     </div>
                 </div>
             </div>
-        </section>
-
-
-        {/* Conversion / Payment Section */}
-        <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-[#333] pt-12">
-            
-            <div className="lg:col-span-6">
-                <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Production Slot</h3>
-                <p className="text-[#888] max-w-lg mb-8">
-                    Your configuration is ready for production scheduling. 
-                    Due to high demand for the {mainProduct.size} raw forgings, we require a deposit to secure your allocation in the milling queue.
-                </p>
-                <div className="flex items-center gap-4 text-xs font-mono text-[#666]">
-                    <div className="flex items-center gap-2">
-                        <Lock className="w-3 h-3" />
-                        <span>256-BIT ENCRYPTED</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <ShieldCheck className="w-3 h-3" />
-                        <span>BUYER PROTECTION</span>
-                    </div>
-                </div>
-            </div>
-
-            <div className="lg:col-span-6 bg-[#111] border border-[#333] p-8 lg:p-12 relative overflow-hidden">
-                {/* Background Grid inside card */}
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none" />
-                
-                <div className="relative z-10">
-                    <div className="flex justify-between items-end mb-4">
-                        <span className="text-[#666] font-mono uppercase text-sm">Total Value (Excl. VAT)</span>
-                        <span className="text-2xl font-mono text-[#EDEDED] decoration-slice decoration-1 underline decoration-[#333] underline-offset-4">
-                            {formatCurrency(data.totaal_excl, data.valuta)}
-                        </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-end mb-12">
-                        <span className="text-[#D4F846] font-mono uppercase text-sm font-bold">Deposit Required</span>
-                        <span className="text-5xl md:text-6xl font-extended text-[#D4F846] tracking-tighter">
-                            {formatCurrency(data.aanbetaling, data.valuta)}
-                        </span>
-                    </div>
-
-                    <button className="w-full bg-[#D4F846] text-black font-bold uppercase font-extended tracking-widest py-6 hover:bg-white transition-all transform active:scale-[0.99] flex items-center justify-center gap-4 group">
-                        Secure Allocation 
-                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                    
-                    <p className="text-center mt-6 text-[#444] text-[10px] font-mono uppercase">
-                        By proceeding you accept our engineering terms & conditions.
-                    </p>
-                </div>
-            </div>
-
         </section>
 
       </motion.div>
