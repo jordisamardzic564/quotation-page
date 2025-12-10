@@ -86,11 +86,19 @@ export default function QuotationView({ data }: QuotationViewProps) {
     data.producten.forEach((p, i) => {
       // Logic:
       // 1. First item is always a main wheel product.
-      // 2. Second item is a main wheel product ONLY if it has a 'size' property (indicating a staggered setup/breedset).
-      // 3. Everything else is an accessory.
+      // 2. Second item is a main wheel product if it has a size OR looks like a wheel in the name.
+      const isWheelLike = (prod: Product) => {
+        if (prod.size && prod.size.trim().length > 0) return true;
+        // Check for patterns like "8.5J x 20", "20x8.5", "ET25"
+        return (
+          /[\d\.]+[Jj]?\s*[xX]\s*\d+/.test(prod.product_naam) ||
+          /ET\s*-?\d+/i.test(prod.product_naam)
+        );
+      };
+
       if (i === 0) {
         wheels.push(p);
-      } else if (i === 1 && p.size && p.size.trim().length > 0) {
+      } else if (i === 1 && isWheelLike(p)) {
         wheels.push(p);
       } else {
         others.push(p);
@@ -202,7 +210,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                         </div>
                       );
                     })}
-                    <div className="text-xs font-mono text-[#D4F846] mt-1">FORGED ALUMINUM 6061-T7</div>
+                    <div className="text-xs font-mono text-[#D4F846] mt-1">FORGED ALUMINUM 6061-T6</div>
                  </div>
              </motion.div>
 
@@ -262,7 +270,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
 
         {/* Configuration List - Horizontal Tech Rows */}
-        <section className="mb-32">
+        <section className="mb-32 max-w-5xl mx-auto">
             <div className="flex items-end justify-between mb-8 border-b border-[#333] pb-4">
                 <h2 className="uppercase tracking-wide" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Build Configuration</h2>
                 <span className="font-mono text-[#666] text-xs">REF: {data.offerte_id}</span>
@@ -366,7 +374,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
 
         {/* Conversion / Payment Section */}
-        <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-[#333] pt-12">
+        <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-[#333] pt-12 max-w-5xl mx-auto">
             
             <div className="lg:col-span-6">
                 <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Production Slot</h3>
