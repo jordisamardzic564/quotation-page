@@ -21,6 +21,7 @@ import { Quotation, Product } from '@/types/quotation';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { TextAnimate } from '@/components/magicui/text-animate';
+import { MagicCard } from '@/components/magicui/magic-card';
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -116,13 +117,19 @@ export default function QuotationView({ data }: QuotationViewProps) {
   const [showIntro, setShowIntro] = useState(true);
 
   // Intro tekst bepalen
-  const introText = `Quotation ${data.offerte_id} personally curated for\n${data.klant_naam}`;
+  // Gebruik de officiele code (name) indien beschikbaar, anders fallback naar geformatteerd ID
+  const displayId = data.name || (typeof data.offerte_id === 'number' 
+    ? `S${data.offerte_id.toString().padStart(5, '0')}`
+    : data.offerte_id);
+
+  const introLine1 = `Quotation ${displayId} personally curated for`;
+  const introLine2 = data.klant_naam;
 
   useEffect(() => {
-    // Totale duur: animatie (2.5s) + delay (1s) = 3.5s
+    // Totale duur: Line 1 (2s) + Line 2 (1s) + Wait (1s) = 4s
     const timer = setTimeout(() => {
       setShowIntro(false);
-    }, 3500);
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -140,28 +147,40 @@ export default function QuotationView({ data }: QuotationViewProps) {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-[100] bg-[#111] flex items-center justify-center px-4"
           >
-            <div className="max-w-4xl text-center">
+            <div className="max-w-4xl text-center flex flex-col items-center">
                 <div className="mb-8">
                     {/* Klein logo of icoon boven de tekst */}
                     <div className="w-2 h-2 bg-[#D4F846] mx-auto rounded-full animate-pulse" />
                 </div>
                 
-                {/* Text Animate Component */}
+                {/* Text Animate Component - Line 1 */}
                 <TextAnimate 
                   animation="blurIn" 
                   by="character" 
-                  duration={2.5} // Iets sneller zodat het binnen de 3s past
-                  className="text-2xl md:text-4xl text-[#EDEDED] font-light uppercase tracking-wide leading-tight"
+                  duration={2} 
+                  className="text-xl md:text-3xl text-[#EDEDED] font-light uppercase tracking-wide leading-tight mb-2 block"
                   style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
                 >
-                  {introText}
+                  {introLine1}
+                </TextAnimate>
+
+                {/* Text Animate Component - Line 2 (Name) */}
+                <TextAnimate 
+                  animation="blurIn" 
+                  by="character" 
+                  duration={1}
+                  delay={2}
+                  className="text-2xl md:text-5xl text-[#EDEDED] font-bold uppercase tracking-wide leading-tight block text-[#D4F846]"
+                  style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
+                >
+                  {introLine2}
                 </TextAnimate>
                 
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 2, duration: 0.5 }}
-                    className="mt-6 text-[#666] font-mono text-xs uppercase tracking-widest"
+                    transition={{ delay: 3, duration: 0.5 }}
+                    className="mt-8 text-[#666] font-mono text-xs uppercase tracking-widest"
                 >
                     Initializing Secure Environment...
                 </motion.div>
@@ -199,7 +218,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
           <div className="flex items-center gap-6">
              <div className="hidden md:block text-right">
                 <div className="text-[10px] text-[#666] uppercase font-mono tracking-wider">Configuration ID</div>
-                <div className="text-sm font-mono text-[#D4F846]">{data.offerte_id}</div>
+                <div className="text-sm font-mono text-[#D4F846]">{data.name || data.offerte_id}</div>
              </div>
              <a
                href="#payment"
@@ -329,7 +348,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
         <section className="mb-32">
             <div className="flex items-end justify-between mb-8 border-b border-[#333] pb-4">
                 <h2 className="uppercase tracking-wide" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Build Configuration</h2>
-                <span className="font-mono text-[#666] text-xs">REF: {data.offerte_id}</span>
+                <span className="font-mono text-[#666] text-xs">REF: {data.name || data.offerte_id}</span>
             </div>
 
             <div className="flex flex-col">
@@ -450,35 +469,44 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 </div>
             </div>
 
-            <div className="lg:col-span-6 bg-[#111] border border-[#333] p-8 lg:p-12 relative overflow-hidden">
-                {/* Background Grid inside card */}
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none" />
-                
-                <div className="relative z-10">
-                    <div className="flex justify-between items-end mb-4">
-                        <span className="text-[#666] font-mono uppercase text-sm">Total Value (Excl. VAT)</span>
-                        <span className="text-2xl font-mono text-[#EDEDED] decoration-slice decoration-1 underline decoration-[#333] underline-offset-4">
-                            {formatCurrency(data.totaal_excl, data.valuta)}
-                        </span>
-                    </div>
+            <MagicCard 
+                className="lg:col-span-6 bg-[#111] border border-[#333] relative overflow-hidden"
+                gradientColor="#D4F846"
+                gradientFrom="#D4F846"
+                gradientTo="#D4F846"
+                gradientOpacity={0.15}
+                gradientSize={300}
+            >
+                <div className="p-8 lg:p-12 h-full">
+                    {/* Background Grid inside card */}
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none" />
                     
-                    <div className="flex justify-between items-end mb-12">
-                        <span className="text-[#D4F846] font-mono uppercase text-sm font-bold">Deposit Required</span>
-                        <span className="text-5xl md:text-6xl font-extended text-[#D4F846] tracking-tighter">
-                            {formatCurrency(data.aanbetaling, data.valuta)}
-                        </span>
-                    </div>
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-end mb-4">
+                            <span className="text-[#666] font-mono uppercase text-sm">Total Value (Excl. VAT)</span>
+                            <span className="text-2xl font-mono text-[#EDEDED] decoration-slice decoration-1 underline decoration-[#333] underline-offset-4">
+                                {formatCurrency(data.totaal_excl, data.valuta)}
+                            </span>
+                        </div>
+                        
+                        <div className="flex justify-between items-end mb-12">
+                            <span className="text-[#D4F846] font-mono uppercase text-sm font-bold">Deposit Required</span>
+                            <span className="text-5xl md:text-6xl font-extended text-[#D4F846] tracking-tighter">
+                                {formatCurrency(data.aanbetaling, data.valuta)}
+                            </span>
+                        </div>
 
-                    <button className="w-full bg-[#D4F846] text-black font-bold uppercase font-extended tracking-widest py-6 hover:bg-white transition-all transform active:scale-[0.99] flex items-center justify-center gap-4 group">
-                        Secure Allocation 
-                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                    
-                    <p className="text-center mt-6 text-[#444] text-[10px] font-mono uppercase">
-                        By proceeding you accept our engineering terms & conditions.
-                    </p>
+                        <button className="w-full bg-[#D4F846] text-black font-bold uppercase font-extended tracking-widest py-6 hover:bg-white transition-all transform active:scale-[0.99] flex items-center justify-center gap-4 group cursor-pointer relative z-20">
+                            Secure Allocation 
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                        
+                        <p className="text-center mt-6 text-[#444] text-[10px] font-mono uppercase">
+                            By proceeding you accept our engineering terms & conditions.
+                        </p>
+                    </div>
                 </div>
-            </div>
+            </MagicCard>
 
         </section>
 

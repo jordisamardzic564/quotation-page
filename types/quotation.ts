@@ -12,6 +12,7 @@ export interface Product {
 
 export interface Quotation {
   offerte_id: number;
+  name: string;
   offerte_url: string;
   klant_naam: string;
   voertuig: string;
