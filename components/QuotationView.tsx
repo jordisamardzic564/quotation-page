@@ -470,7 +470,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
             </div>
 
             <MagicCard 
-                className="lg:col-span-6 bg-[#111] border border-[#333] relative overflow-hidden"
+                className="lg:col-span-6 bg-[#333] relative overflow-hidden"
                 gradientColor="transparent"
                 gradientFrom="#D4F846"
                 gradientTo="#D4F846"
@@ -510,8 +510,8 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
         </section>
 
-        {/* Premium 4-Step Process - VERPLAATST NAAR ONDER */}
-        <section className="mb-32">
+        {/* Premium 4-Step Process - TEMPORARILY HIDDEN */}
+        {/* <section className="mb-32">
              <div className="mb-12 border-b border-[#333] pb-4">
                 <h2 className="uppercase tracking-wide" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Premium 4-Step Process</h2>
             </div>
@@ -560,11 +560,11 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     </div>
                 ))}
             </div>
-        </section>
+        </section> */}
 
 
-        {/* Technical FAQ Section - OOK VERPLAATST NAAR ONDER */}
-        <section className="mb-32 border-t border-[#333] pt-12">
+        {/* Technical FAQ Section - TEMPORARILY HIDDEN */}
+        {/* <section className="mb-32 border-t border-[#333] pt-12">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <div className="lg:col-span-4">
                      <h2 className="uppercase tracking-wide mb-4" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '24px', color: '#fff' }}>
@@ -612,7 +612,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     </div>
                 </div>
             </div>
-        </section>
+        </section> */}
 
       </motion.div>
 
