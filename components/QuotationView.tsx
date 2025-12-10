@@ -123,7 +123,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
     // Bijv: 3 seconden lezen + 1 seconde animatie
     const timer = setTimeout(() => {
       setShowIntro(false);
-    }, 4500);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -149,9 +149,9 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 
                 {/* Text Animate Component */}
                 <TextAnimate 
-                  animation="blurInUp" 
-                  by="word" 
-                  duration={3} // Langzamere, elegantere animatie
+                  animation="blurIn" 
+                  by="character" 
+                  duration={2.5} // Iets sneller zodat het binnen de 3s past
                   className="text-2xl md:text-4xl text-[#EDEDED] font-light uppercase tracking-wide leading-tight"
                   style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
                 >
@@ -161,7 +161,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 2.5, duration: 1 }}
+                    transition={{ delay: 2, duration: 0.5 }}
                     className="mt-6 text-[#666] font-mono text-xs uppercase tracking-widest"
                 >
                     Initializing Secure Environment...
