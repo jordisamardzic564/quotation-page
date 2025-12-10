@@ -374,54 +374,106 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
 
         {/* Premium 4-Step Process */}
-        <section className="mb-24">
-             <div className="mb-8 border-b border-[#333] pb-4">
-                <h2 className="uppercase tracking-wide" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '24px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Premium 4-Step Process</h2>
+        <section className="mb-32">
+             <div className="mb-12 border-b border-[#333] pb-4">
+                <h2 className="uppercase tracking-wide" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Premium 4-Step Process</h2>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {[
                     {
                         step: "01",
                         title: "Order Confirmation",
-                        desc1: "Order confirmed & reserved.",
-                        desc2: "Specs validated for design."
+                        desc1: "Your order is confirmed and reserved in our production queue.",
+                        desc2: "We validate all specifications and prepare your project for the design phase."
                     },
                     {
                         step: "02",
-                        title: "3D Engineering",
-                        desc1: "Bespoke 3D visuals created.",
-                        desc2: "Engineered for perfect fitment."
+                        title: "3D Rendering & Engineering",
+                        desc1: "Our design team creates bespoke 3D visuals of your wheels.",
+                        desc2: "Each detail is engineered to match your vehicle perfectly."
                     },
                     {
                         step: "03",
                         title: "Precision Manufacturing",
-                        desc1: "CNC forging & finishing.",
-                        desc2: "Crafted to aerospace standards."
+                        desc1: "Your wheels enter CNC forging and finishing.",
+                        desc2: "A meticulous production process crafted to aerospace-grade standards."
                     },
                     {
                         step: "04",
                         title: "Shipping & Delivery",
-                        desc1: "Quality-checked & dispatched.",
-                        desc2: "Tracked worldwide delivery."
+                        desc1: "Your custom wheels are quality-checked and dispatched.",
+                        desc2: "Tracked worldwide shipping ensures a safe and reliable delivery."
                     }
                 ].map((item, i) => (
                     <div key={i} className="relative group">
                          {/* Step Number */}
-                        <div className="text-4xl md:text-5xl font-bold text-[#222] group-hover:text-[#D4F846]/20 transition-colors mb-2 opacity-50 select-none" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>
+                        <div className="text-6xl md:text-8xl font-bold text-[#222] group-hover:text-[#D4F846]/20 transition-colors mb-4 opacity-50 select-none" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>
                             {item.step}
                         </div>
                         
                          {/* Content */}
-                        <div className="relative z-10 border-l border-[#333] pl-4 group-hover:border-[#D4F846] transition-colors h-full pb-2">
-                            <h3 className="text-sm font-bold uppercase mb-2 text-[#EDEDED]" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>{item.title}</h3>
-                            <div className="space-y-1 text-xs text-[#888] font-mono leading-relaxed">
+                        <div className="relative z-10 border-l border-[#333] pl-6 group-hover:border-[#D4F846] transition-colors h-full pb-4">
+                            <h3 className="text-lg font-bold uppercase mb-4 text-[#EDEDED]" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>{item.title}</h3>
+                            <div className="space-y-4 text-sm text-[#888] font-mono leading-relaxed">
                                 <p>{item.desc1}</p>
                                 <p>{item.desc2}</p>
                             </div>
                         </div>
                     </div>
                 ))}
+            </div>
+        </section>
+
+
+        {/* Technical FAQ Section */}
+        <section className="mb-32 border-t border-[#333] pt-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <div className="lg:col-span-4">
+                     <h2 className="uppercase tracking-wide mb-4" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '24px', color: '#fff' }}>
+                        Engineering<br/>Support
+                    </h2>
+                    <p className="text-[#888] text-sm font-mono mb-6">
+                        Direct antwoord op veelgestelde technische vragen. Voor specifieke verzoeken, neem contact op met je engineering lead.
+                    </p>
+                     <div className="flex items-center gap-2 text-xs font-mono text-[#D4F846]">
+                        <div className="w-2 h-2 bg-[#D4F846] rounded-full animate-pulse" />
+                        <span>ENGINEERING TEAM ONLINE</span>
+                    </div>
+                </div>
+
+                <div className="lg:col-span-8">
+                    <div className="space-y-4">
+                        {[
+                            {
+                                q: "What is the estimated production timeline?",
+                                a: "Standard production time for monoblock forgings is 4-6 weeks from design approval. Multi-piece configurations may require 6-8 weeks depending on finish complexity."
+                            },
+                            {
+                                q: "Is the deposit refundable?",
+                                a: "The deposit secures your raw aluminum allocation and engineering slot. Once the design phase begins (Step 02), the deposit becomes non-refundable due to the bespoke nature of the engineering work."
+                            },
+                            {
+                                q: "Are the wheels TUV / JWL certified?",
+                                a: "Yes. All Korbach Forged wheels are engineered to exceed JWL/VIA load ratings. TUV certification documents can be provided upon request for specific vehicle applications."
+                            },
+                            {
+                                q: "Can I still change the finish after ordering?",
+                                a: "You can adjust the finish specifications up until the 'Precision Manufacturing' phase begins. Your dedicated engineer will confirm the final spec with you before milling starts."
+                            }
+                        ].map((faq, i) => (
+                            <div key={i} className="border border-[#333] bg-[#111] p-6 hover:border-[#666] transition-colors cursor-default group">
+                                <h4 className="text-[#EDEDED] font-bold uppercase text-sm mb-2 flex justify-between items-center" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>
+                                    {faq.q}
+                                    <ChevronRight className="w-4 h-4 text-[#666] group-hover:text-[#D4F846] transition-colors" />
+                                </h4>
+                                <p className="text-[#888] text-xs font-mono leading-relaxed">
+                                    {faq.a}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </section>
 
