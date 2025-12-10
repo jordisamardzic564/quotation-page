@@ -530,8 +530,6 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
         </section>
 
-        </section>
-
       </motion.div>
 
        {/* Footer Anchor - Copy of Main Site Footer */}
