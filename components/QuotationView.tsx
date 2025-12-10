@@ -471,10 +471,10 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
             <MagicCard 
                 className="lg:col-span-6 bg-[#111] border border-[#333] relative overflow-hidden"
-                gradientColor="#D4F846"
+                gradientColor="transparent"
                 gradientFrom="#D4F846"
                 gradientTo="#D4F846"
-                gradientOpacity={0.15}
+                gradientOpacity={0}
                 gradientSize={300}
             >
                 <div className="p-8 lg:p-12 h-full">
