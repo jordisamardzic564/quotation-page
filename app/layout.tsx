@@ -34,10 +34,31 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://quote.korbachforged.com"),
   title: "Korbach Forged - Exclusive Configuration",
   description: "Your verified vehicle configuration.",
   icons: {
-    icon: '/favicon.png',
+    icon: "/favicon.png",
+  },
+  openGraph: {
+    title: "Korbach Forged - Exclusive Configuration",
+    description: "Your verified vehicle configuration.",
+    url: "/",
+    siteName: "Korbach Forged",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Korbach Forged logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Korbach Forged - Exclusive Configuration",
+    description: "Your verified vehicle configuration.",
+    images: ["/logo.png"],
   },
 };
 

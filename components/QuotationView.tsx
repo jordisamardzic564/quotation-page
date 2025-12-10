@@ -40,6 +40,35 @@ const formatCurrency = (amount: number, currency: string) => {
   }).format(amount);
 };
 
+const extractEtValue = (product: Product, parsed: { title: string; description: string }) => {
+  const candidates = [
+    product.product_naam,
+    product.size,
+    product.model,
+    parsed.title,
+    parsed.description,
+  ];
+
+  for (const text of candidates) {
+    if (!text) continue;
+    const match = text.match(/ET\s*(-?\d+)/i);
+    if (match) {
+      const value = Number(match[1]);
+      if (!Number.isNaN(value)) return value;
+    }
+  }
+  return null;
+};
+
+const getConcaveBadge = (et: number | null) => {
+  if (et === null) return null;
+  if (et >= 41 && et <= 80) return "Performance";
+  if (et >= 31 && et <= 40) return "Medium";
+  if (et >= 21 && et <= 30) return "Deep";
+  if (et >= 0 && et <= 20) return "Super Deep";
+  return null;
+};
+
 const parseProduct = (product: Product) => {
   const parts = product.product_naam.split('\n');
   let title = parts[0];
@@ -363,6 +392,8 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 {/* Main Product Rows (Wheels) */}
                 {wheelProducts.map((wheel) => {
                   const parsed = parseProduct(wheel);
+                  const etValue = extractEtValue(wheel, parsed);
+                  const concaveProfile = getConcaveBadge(etValue);
                   return (
                     <motion.div
                       key={wheel.product_id}
@@ -387,14 +418,13 @@ export default function QuotationView({ data }: QuotationViewProps) {
                         <p className="text-[#888] text-sm leading-relaxed">
                           {parsed.description}
                         </p>
-                        <div className="flex gap-4 mt-4">
-                          <span className="text-xs font-mono bg-[#111] px-2 py-1 border border-[#222] text-[#AAA]">
-                            {wheel.size}
-                          </span>
-                          <span className="text-xs font-mono bg-[#111] px-2 py-1 border border-[#222] text-[#AAA]">
-                            5x112
-                          </span>
-                        </div>
+                        {concaveProfile && (
+                          <div className="flex gap-4 mt-4">
+                            <span className="text-xs font-mono bg-[#0f0f0f] px-3 py-1 border border-[#333] text-[#D4F846] uppercase tracking-wider">
+                              {concaveProfile} Concave
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] flex items-start justify-end">
                         {wheel.quantity}
@@ -517,7 +547,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                             <div className="mt-4 pt-4 border-t border-[#333] w-full text-center">
                                 <div className="text-[10px] text-[#444] font-mono uppercase tracking-widest mb-1">Verified by</div>
                                 <div className="text-xs text-[#888] font-bold uppercase" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>Vincent Pedroli</div>
-                                <div className="text-[9px] text-[#D4F846] font-mono">Head of Engineering</div>
+                                <div className="text-[9px] text-[#D4F846] font-mono">Fitment Specialist</div>
                             </div>
                         </div>
 
