@@ -373,6 +373,59 @@ export default function QuotationView({ data }: QuotationViewProps) {
         </section>
 
 
+        {/* Premium 4-Step Process */}
+        <section className="mb-32">
+             <div className="mb-12 border-b border-[#333] pb-4">
+                <h2 className="uppercase tracking-wide" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Premium 4-Step Process</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {[
+                    {
+                        step: "01",
+                        title: "Order Confirmation",
+                        desc1: "Your order is confirmed and reserved in our production queue.",
+                        desc2: "We validate all specifications and prepare your project for the design phase."
+                    },
+                    {
+                        step: "02",
+                        title: "3D Rendering & Engineering",
+                        desc1: "Our design team creates bespoke 3D visuals of your wheels.",
+                        desc2: "Each detail is engineered to match your vehicle perfectly."
+                    },
+                    {
+                        step: "03",
+                        title: "Precision Manufacturing",
+                        desc1: "Your wheels enter CNC forging and finishing.",
+                        desc2: "A meticulous production process crafted to aerospace-grade standards."
+                    },
+                    {
+                        step: "04",
+                        title: "Shipping & Delivery",
+                        desc1: "Your custom wheels are quality-checked and dispatched.",
+                        desc2: "Tracked worldwide shipping ensures a safe and reliable delivery."
+                    }
+                ].map((item, i) => (
+                    <div key={i} className="relative group">
+                         {/* Step Number */}
+                        <div className="text-6xl md:text-8xl font-bold text-[#222] group-hover:text-[#D4F846]/20 transition-colors mb-4 opacity-50 select-none" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>
+                            {item.step}
+                        </div>
+                        
+                         {/* Content */}
+                        <div className="relative z-10 border-l border-[#333] pl-6 group-hover:border-[#D4F846] transition-colors h-full pb-4">
+                            <h3 className="text-lg font-bold uppercase mb-4 text-[#EDEDED]" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>{item.title}</h3>
+                            <div className="space-y-4 text-sm text-[#888] font-mono leading-relaxed">
+                                <p>{item.desc1}</p>
+                                <p>{item.desc2}</p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </section>
+
+
         {/* Conversion / Payment Section */}
         <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-[#333] pt-12">
             
