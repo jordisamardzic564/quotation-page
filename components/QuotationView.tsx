@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Check, 
   ShieldCheck, 
@@ -20,6 +20,7 @@ import {
 import { Quotation, Product } from '@/types/quotation';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { TextAnimate } from '@/components/magicui/text-animate';
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -111,9 +112,65 @@ export default function QuotationView({ data }: QuotationViewProps) {
   const mainProduct = wheelProducts[0];
   const parsedMainProduct = parseProduct(mainProduct);
 
+  // Intro State
+  const [showIntro, setShowIntro] = useState(true);
+
+  // Intro tekst bepalen
+  const introText = `Quotation ${data.offerte_id} personally curated for ${data.klant_naam}`;
+
+  useEffect(() => {
+    // Totale duur iets langer maken zodat de animatie rustig kan afspelen + leestijd
+    // Bijv: 3 seconden lezen + 1 seconde animatie
+    const timer = setTimeout(() => {
+      setShowIntro(false);
+    }, 4500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-transparent text-[#EDEDED] font-sans selection:bg-[#D4F846] selection:text-black overflow-x-hidden">
       
+      {/* INTRO OVERLAY */}
+      <AnimatePresence>
+        {showIntro && (
+          <motion.div
+            key="intro-overlay"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="fixed inset-0 z-[100] bg-[#111] flex items-center justify-center px-4"
+          >
+            <div className="max-w-4xl text-center">
+                <div className="mb-8">
+                    {/* Klein logo of icoon boven de tekst */}
+                    <div className="w-2 h-2 bg-[#D4F846] mx-auto rounded-full animate-pulse" />
+                </div>
+                
+                {/* Text Animate Component */}
+                <TextAnimate 
+                  animation="blurInUp" 
+                  by="word" 
+                  duration={3} // Langzamere, elegantere animatie
+                  className="text-2xl md:text-4xl text-[#EDEDED] font-light uppercase tracking-wide leading-tight"
+                  style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
+                >
+                  {introText}
+                </TextAnimate>
+                
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 2.5, duration: 1 }}
+                    className="mt-6 text-[#666] font-mono text-xs uppercase tracking-widest"
+                >
+                    Initializing Secure Environment...
+                </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Decorative Crosshairs Fixed */}
       <div className="fixed top-8 left-8 w-4 h-4 border-l border-t border-[#333] z-50 opacity-50" />
       <div className="fixed top-8 right-8 w-4 h-4 border-r border-t border-[#333] z-50 opacity-50" />
