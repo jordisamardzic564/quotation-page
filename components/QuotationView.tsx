@@ -122,7 +122,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
       {/* Header / Nav Anchor */}
       <nav className="fixed top-0 w-full z-40 bg-[#161616]/90 backdrop-blur-sm border-b border-[#333]">
-        <div className="max-w-[1920px] mx-auto px-4 md:px-12 lg:px-24 h-20 flex items-center justify-between">
+        <div className="max-w-[1280px] mx-auto px-4 md:px-12 lg:px-24 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
              {/* Logo */}
              <div className="relative w-40 h-10">
@@ -157,7 +157,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
       </nav>
 
       <motion.div 
-        className="pt-32 pb-32 max-w-[1920px] mx-auto px-4 md:px-12 lg:px-24"
+        className="pt-32 pb-32 max-w-[1280px] mx-auto px-4 md:px-12 lg:px-24"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
@@ -270,7 +270,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
 
         {/* Configuration List - Horizontal Tech Rows */}
-        <section className="mb-32 max-w-5xl mx-auto">
+        <section className="mb-32">
             <div className="flex items-end justify-between mb-8 border-b border-[#333] pb-4">
                 <h2 className="uppercase tracking-wide" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Build Configuration</h2>
                 <span className="font-mono text-[#666] text-xs">REF: {data.offerte_id}</span>
@@ -374,7 +374,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
 
         {/* Conversion / Payment Section */}
-        <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-[#333] pt-12 max-w-5xl mx-auto">
+        <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-[#333] pt-12">
             
             <div className="lg:col-span-6">
                 <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Production Slot</h3>
@@ -430,7 +430,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
        {/* Footer Anchor - Copy of Main Site Footer */}
        <footer className="bg-black border-t border-[#222] py-12">
-            <div className="max-w-[1920px] mx-auto px-4 md:px-12 lg:px-24 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="max-w-[1280px] mx-auto px-4 md:px-12 lg:px-24 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="text-[#333] font-extended uppercase tracking-widest text-sm">
                     Korbach Forged ///
                 </div>
