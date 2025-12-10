@@ -36,6 +36,9 @@ const lato = Lato({
 export const metadata: Metadata = {
   title: "Korbach Forged - Exclusive Configuration",
   description: "Your verified vehicle configuration.",
+  icons: {
+    icon: '/favicon.png',
+  },
 };
 
 export default function RootLayout({
