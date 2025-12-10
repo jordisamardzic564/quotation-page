@@ -22,5 +22,6 @@ export interface Quotation {
   aantal_regels: number;
   aanbetaling: number;
   valuta: string;
+  payment_mode?: 'deposit' | 'full';
 }
 

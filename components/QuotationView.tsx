@@ -15,7 +15,8 @@ import {
   ChevronRight,
   Info,
   Crosshair,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from 'lucide-react';
 import { Quotation, Product } from '@/types/quotation';
 import clsx from 'clsx';
@@ -141,6 +142,44 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
   const mainProduct = wheelProducts[0];
   const parsedMainProduct = parseProduct(mainProduct);
+
+  // State alleen nog voor laden van betaling
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Bepaal labels op basis van data uit backend
+  // Als payment_mode niet is meegegeven, vallen we terug op 'deposit' als veilige optie, of checken we of aanbetaling < totaal
+  const isFullPayment = data.payment_mode === 'full' || (data.aanbetaling >= data.totaal_excl);
+  
+  const paymentLabel = isFullPayment ? "Total Amount Due" : "Deposit Required";
+  const buttonText = isFullPayment ? "Complete Payment" : "Secure Allocation";
+
+  const handlePayment = async () => {
+    setIsLoading(true);
+    try {
+      // We sturen alleen ID, backend bepaalt bedrag/type
+      const response = await fetch('/api/create-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          offerte_id: data.offerte_id
+          // Geen keuze meer meesturen, backend is leidend
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.url) {
+        window.location.href = result.url;
+      } else {
+        alert('Kon geen betaallink genereren.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Er ging iets mis.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Intro State
   const [showIntro, setShowIntro] = useState(true);
@@ -482,10 +521,14 @@ export default function QuotationView({ data }: QuotationViewProps) {
         <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-[#333] pt-12 mb-32">
             
             <div className="lg:col-span-6">
-                <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Production Slot</h3>
+                <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>
+                    {isFullPayment ? 'Complete Your Order' : 'Production Slot'}
+                </h3>
                 <p className="text-[#888] max-w-lg mb-8">
-                    Your configuration is ready for production scheduling. 
-                    Due to high demand for the {mainProduct.size} raw forgings, we require a deposit to secure your allocation in the milling queue.
+                    {isFullPayment 
+                        ? `Your configuration is approved. Please complete the full payment of ${formatCurrency(data.aanbetaling, data.valuta)} to proceed directly to production.`
+                        : `Your configuration is ready. Due to high demand for the ${mainProduct.size} raw forgings, we require a deposit of ${formatCurrency(data.aanbetaling, data.valuta)} to secure your allocation in the milling queue.`
+                    }
                 </p>
                 <div className="flex items-center gap-4 text-xs font-mono text-[#666]">
                     <div className="flex items-center gap-2">
@@ -513,22 +556,29 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     
                     <div className="relative z-10">
                         <div className="flex justify-between items-end mb-4">
-                            <span className="text-[#666] font-mono uppercase text-sm">Total Value (Excl. VAT)</span>
+                            <span className="text-[#666] font-mono uppercase text-sm">Order Value (Excl.)</span>
                             <span className="text-2xl font-mono text-[#EDEDED] decoration-slice decoration-1 underline decoration-[#333] underline-offset-4">
                                 {formatCurrency(data.totaal_excl, data.valuta)}
                             </span>
                         </div>
                         
                         <div className="flex justify-between items-end mb-12">
-                            <span className="text-[#D4F846] font-mono uppercase text-sm font-bold">Deposit Required</span>
+                            <span className="text-[#D4F846] font-mono uppercase text-sm font-bold">
+                                {paymentLabel}
+                            </span>
                             <span className="text-5xl md:text-6xl font-extended text-[#D4F846] tracking-tighter">
                                 {formatCurrency(data.aanbetaling, data.valuta)}
                             </span>
                         </div>
 
-                        <button className="w-full bg-[#D4F846] text-black font-bold uppercase font-extended tracking-widest py-6 hover:bg-white transition-all transform active:scale-[0.99] flex items-center justify-center gap-4 group cursor-pointer relative z-20">
-                            Secure Allocation 
-                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        <button 
+                            onClick={handlePayment}
+                            disabled={isLoading}
+                            className="w-full bg-[#D4F846] text-black font-bold uppercase font-extended tracking-widest py-6 hover:bg-white transition-all transform active:scale-[0.99] flex items-center justify-center gap-4 group cursor-pointer relative z-20 disabled:opacity-70 disabled:cursor-wait"
+                        >
+                            {isLoading ? 'Processing...' : buttonText}
+                            {!isLoading && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                            {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
                         </button>
                         
                         {/* Trust & Conversion Elements */}
