@@ -1,4 +1,5 @@
 import QuotationView from "@/components/QuotationView";
+import SuccessView from "@/components/SuccessView";
 import { Quotation } from "@/types/quotation";
 import { headers } from "next/headers";
 
@@ -122,10 +123,20 @@ export default async function OffertePage({
     );
   }
 
+  // Check payment status
+  const status = typeof resolvedSearchParams?.status === 'string' ? resolvedSearchParams.status : undefined;
+
+  if (status === 'success') {
+    return (
+      <main className="min-h-screen">
+        <SuccessView data={quotation} />
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen">
       <QuotationView data={quotation} />
     </main>
   );
 }
-

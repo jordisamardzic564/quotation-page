@@ -185,10 +185,8 @@ export default function QuotationView({ data }: QuotationViewProps) {
   const [showIntro, setShowIntro] = useState(true);
 
   // Intro tekst bepalen
-  // Gebruik de officiele code (name) indien beschikbaar, anders fallback naar geformatteerd ID
-  const displayId = data.name || (typeof data.offerte_id === 'number' 
-    ? `S${data.offerte_id.toString().padStart(5, '0')}`
-    : data.offerte_id);
+  // Gebruik altijd het name veld (S-nummer), nooit het interne database ID
+  const displayId = data.name;
 
   const introLine1 = `Quotation ${displayId} personally curated for`;
   const introLine2 = data.klant_naam;
@@ -286,7 +284,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
           <div className="flex items-center gap-6">
              <div className="hidden md:block text-right">
                 <div className="text-[10px] text-[#666] uppercase font-mono tracking-wider">Configuration ID</div>
-                <div className="text-sm font-mono text-[#D4F846]">{data.name || data.offerte_id}</div>
+                <div className="text-sm font-mono text-[#D4F846]">{data.name}</div>
              </div>
              <a
                href="#payment"
@@ -321,11 +319,11 @@ export default function QuotationView({ data }: QuotationViewProps) {
                             src={mainProduct.afbeelding} 
                             alt={parsedMainProduct.title}
                             fill
-                            className="object-contain drop-shadow-2xl z-10"
+                            className="object-contain drop-shadow-2xl z-10 rounded-2xl"
                             priority
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#111]">
+                        <div className="w-full h-full flex items-center justify-center bg-[#111] rounded-2xl">
                             <Disc className="w-24 h-24 text-[#333]" />
                         </div>
                     )}
@@ -416,7 +414,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
         <section className="mb-32">
             <div className="flex items-end justify-between mb-8 border-b border-[#333] pb-4">
                 <h2 className="uppercase tracking-wide" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Build Configuration</h2>
-                <span className="font-mono text-[#666] text-xs">REF: {data.name || data.offerte_id}</span>
+                <span className="font-mono text-[#666] text-xs">REF: {data.name}</span>
             </div>
 
             <div className="flex flex-col">
