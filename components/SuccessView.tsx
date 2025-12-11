@@ -34,8 +34,17 @@ export default function SuccessView({ data }: SuccessViewProps) {
   const paidAmount = isFullPayment ? data.totaal_excl : data.aanbetaling;
   const paymentLabel = isFullPayment ? "Total Paid" : "Deposit Paid";
   
-  // Gebruik altijd het name veld (S-nummer), nooit het interne database ID
-  const displayId = data.name;
+  // Gebruik altijd het name veld (S-nummer).
+  // Fallback naar een placeholder als 'name' leeg is, zodat de layout niet breekt.
+  const displayId = data.name || "—";
+
+  // Debug logging om te controleren of 'name' goed doorkomt
+  React.useEffect(() => {
+    console.log("SuccessView Data:", data);
+    if (!data.name) {
+      console.warn("Waarschuwing: 'name' veld is leeg in quotation data!", data);
+    }
+  }, [data]);
 
   return (
     <div className="min-h-screen bg-[#161616] text-[#EDEDED] font-sans selection:bg-[#D4F846] selection:text-black overflow-x-hidden flex flex-col">
