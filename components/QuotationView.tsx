@@ -140,6 +140,38 @@ export default function QuotationView({ data }: QuotationViewProps) {
     return { wheelProducts: wheels, accessoryProducts: others };
   }, [data.producten]);
 
+  // === COUNTDOWN LOGIC ===
+  const [timeLeft, setTimeLeft] = useState<string>('');
+  const [isExpired, setIsExpired] = useState<boolean>(false);
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      if (!data.geldig_tot) return;
+
+      const validUntil = new Date(data.geldig_tot).getTime();
+      const now = new Date().getTime();
+      const difference = validUntil - now;
+
+      if (difference <= 0) {
+        setIsExpired(true);
+        setTimeLeft("OFFER EXPIRED");
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      const formattedTime = `${String(days).padStart(2, '0')} Days ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      setTimeLeft(formattedTime);
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(timer);
+  }, [data.geldig_tot]);
+
   const mainProduct = wheelProducts[0];
   const parsedMainProduct = parseProduct(mainProduct);
 
@@ -287,9 +319,16 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 <div className="text-sm font-mono text-[#D4F846]">{data.name}</div>
              </div>
              <a
-               href="#payment"
+               href={isExpired ? undefined : "#payment"}
                role="button"
-               className="bg-[#D4F846] text-black hover:bg-white transition-colors text-xs font-bold uppercase tracking-widest py-3 px-6 skew-x-[-10deg] inline-block"
+               aria-disabled={isExpired}
+               className={cn(
+                 "text-xs font-bold uppercase tracking-widest py-3 px-6 skew-x-[-10deg] inline-block transition-colors",
+                 isExpired 
+                  ? "bg-[#333] text-[#666] cursor-not-allowed" 
+                  : "bg-[#D4F846] text-black hover:bg-white"
+               )}
+               onClick={(e) => isExpired && e.preventDefault()}
              >
                 <span className="skew-x-[10deg] inline-block">Secure Build</span>
              </a>
@@ -357,9 +396,14 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
             {/* Right: The Typography */}
             <motion.div variants={itemVariants} className="order-1 lg:order-2">
-                <div className="flex items-center gap-2 mb-6">
-                    <div className="w-2 h-2 bg-[#D4F846]" />
-                    <span className="font-mono text-xs text-[#D4F846] uppercase tracking-widest">Awaiting Approval</span>
+                <div id="quote-status-bar" className={cn("flex items-center gap-2 mb-6 transition-colors duration-300", isExpired ? "expired-status" : "")}>
+                    <div className={cn("w-2 h-2 transition-colors duration-300", isExpired ? "bg-red-600" : "bg-[#D4F846] animate-pulse")} />
+                    <span className={cn(
+                        "font-mono text-xs uppercase tracking-widest transition-colors duration-300",
+                        isExpired ? "text-red-600 font-bold" : "text-[#D4F846]"
+                    )}>
+                        {timeLeft || "CALCULATING..."}
+                    </span>
                 </div>
                 
                 <h1
@@ -571,11 +615,16 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
                         <button 
                             onClick={handlePayment}
-                            disabled={isLoading}
-                            className="w-full bg-[#D4F846] text-black font-bold uppercase font-extended tracking-widest py-6 hover:bg-white transition-all transform active:scale-[0.99] flex items-center justify-center gap-4 group cursor-pointer relative z-20 disabled:opacity-70 disabled:cursor-wait"
+                            disabled={isLoading || isExpired}
+                            className={cn(
+                                "w-full font-bold uppercase font-extended tracking-widest py-6 transition-all transform flex items-center justify-center gap-4 group relative z-20",
+                                isExpired 
+                                    ? "bg-[#222] text-[#666] cursor-not-allowed border border-[#333]" 
+                                    : "bg-[#D4F846] text-black hover:bg-white active:scale-[0.99] cursor-pointer disabled:opacity-70 disabled:cursor-wait"
+                            )}
                         >
-                            {isLoading ? 'Processing...' : buttonText}
-                            {!isLoading && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                            {isExpired ? 'OFFER EXPIRED' : (isLoading ? 'Processing...' : buttonText)}
+                            {!isLoading && !isExpired && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                             {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
                         </button>
                         
