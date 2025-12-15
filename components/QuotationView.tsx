@@ -140,6 +140,34 @@ export default function QuotationView({ data }: QuotationViewProps) {
     return { wheelProducts: wheels, accessoryProducts: others };
   }, [data.producten]);
 
+  // === TRACKING LOGIC ===
+  const trackEvent = (eventName: string, metadata: Record<string, any> = {}) => {
+    // We gebruiken 'fire-and-forget' zodat de gebruiker niet hoeft te wachten
+    try {
+      fetch('https://n8n.srv865019.hstgr.cloud/webhook/offerte-tracking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          offerte_id: data.name, // Het S-nummer (bijv. S00290) voor Odoo lookup
+          event: eventName,
+          timestamp: new Date().toISOString(),
+          extra: {
+            url: typeof window !== 'undefined' ? window.location.href : '',
+            referrer: typeof document !== 'undefined' ? document.referrer : '',
+            ...metadata
+          }
+        }),
+      }).catch(err => console.error('Tracking error:', err));
+    } catch (e) {
+      // Negeer fouten om de UI niet te breken
+    }
+  };
+
+  // Track pagina bezoek bij laden
+  useEffect(() => {
+    trackEvent('pagina_bezocht');
+  }, []);
+
   // === COUNTDOWN LOGIC ===
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [isExpired, setIsExpired] = useState<boolean>(false);
@@ -186,6 +214,11 @@ export default function QuotationView({ data }: QuotationViewProps) {
   const buttonText = isFullPayment ? "Complete Payment" : "Secure Allocation";
 
   const handlePayment = async () => {
+    // Track dat er op de knop is geklikt
+    trackEvent('click_op_knop', { 
+      knop_type: isFullPayment ? 'complete_payment' : 'secure_allocation' 
+    });
+
     setIsLoading(true);
     try {
       // We sturen alleen ID, backend bepaalt bedrag/type
