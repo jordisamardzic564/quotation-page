@@ -24,5 +24,7 @@ export interface Quotation {
   valuta: string;
   payment_mode?: 'deposit' | 'full';
   geldig_tot: string;
+  has_tax?: boolean;
+  totaal_incl?: number;
 }
 
