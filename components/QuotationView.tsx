@@ -142,9 +142,9 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
   // === TRACKING LOGIC ===
   const trackEvent = (eventName: string, metadata: Record<string, any> = {}) => {
-    // We gebruiken 'fire-and-forget' zodat de gebruiker niet hoeft te wachten
+    // We gebruiken 'fire-and-forget' via onze eigen API route om CORS te vermijden
     try {
-      fetch('https://n8n.srv865019.hstgr.cloud/webhook/offerte-tracking', {
+      fetch('/api/track-event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
