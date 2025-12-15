@@ -61,13 +61,34 @@ const extractEtValue = (product: Product, parsed: { title: string; description: 
   return null;
 };
 
+const CONCAVE_LEVELS = {
+  PERFORMANCE: 1,
+  MEDIUM: 2,
+  DEEP: 3,
+  SUPER_DEEP: 4,
+};
+
+const getConcaveLevel = (et: number | null) => {
+  if (et === null) return 0;
+  if (et >= 41 && et <= 80) return CONCAVE_LEVELS.PERFORMANCE;
+  if (et >= 31 && et <= 40) return CONCAVE_LEVELS.MEDIUM;
+  if (et >= 21 && et <= 30) return CONCAVE_LEVELS.DEEP;
+  if (et >= 0 && et <= 20) return CONCAVE_LEVELS.SUPER_DEEP;
+  return 0;
+};
+
+const getConcaveName = (level: number) => {
+  switch (level) {
+    case CONCAVE_LEVELS.PERFORMANCE: return "Performance";
+    case CONCAVE_LEVELS.MEDIUM: return "Medium";
+    case CONCAVE_LEVELS.DEEP: return "Deep";
+    case CONCAVE_LEVELS.SUPER_DEEP: return "Super Deep";
+    default: return null;
+  }
+};
+
 const getConcaveBadge = (et: number | null) => {
-  if (et === null) return null;
-  if (et >= 41 && et <= 80) return "Performance";
-  if (et >= 31 && et <= 40) return "Medium";
-  if (et >= 21 && et <= 30) return "Deep";
-  if (et >= 0 && et <= 20) return "Super Deep";
-  return null;
+  return getConcaveName(getConcaveLevel(et));
 };
 
 const parseProduct = (product: Product) => {
@@ -139,6 +160,34 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
     return { wheelProducts: wheels, accessoryProducts: others };
   }, [data.producten]);
+
+  // === CONCAVE LOGIC ===
+  // Bereken concave profielen met logica: Voor mag niet dieper zijn dan Achter
+  const wheelConcaveProfiles = useMemo(() => {
+    // Eerst alle levels berekenen
+    const levels = wheelProducts.map((wheel) => {
+      const parsed = parseProduct(wheel);
+      const et = extractEtValue(wheel, parsed);
+      return getConcaveLevel(et);
+    });
+
+    // Als we precies 2 wielen hebben (Voor & Achter set), pas logica toe
+    // Aanname: index 0 = Voor, index 1 = Achter
+    if (levels.length === 2) {
+      const frontLevel = levels[0];
+      const rearLevel = levels[1];
+
+      // Als achteras een geldige ET heeft (level > 0)
+      // En vooras is dieper dan achteras (hoger level)
+      // Dan vooras downgraden naar achteras level
+      if (rearLevel > 0 && frontLevel > rearLevel) {
+        levels[0] = rearLevel;
+      }
+    }
+
+    // Zet levels om naar namen
+    return levels.map(getConcaveName);
+  }, [wheelProducts]);
 
   // === TRACKING LOGIC ===
   const trackEvent = (eventName: string, metadata: Record<string, any> = {}) => {
@@ -594,10 +643,9 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 </div>
 
                 {/* Main Product Rows (Wheels) */}
-                {wheelProducts.map((wheel) => {
+                {wheelProducts.map((wheel, index) => {
                   const parsed = parseProduct(wheel);
-                  const etValue = extractEtValue(wheel, parsed);
-                  const concaveProfile = getConcaveBadge(etValue);
+                  const concaveProfile = wheelConcaveProfiles[index];
                   return (
                     <motion.div
                       key={wheel.product_id}
