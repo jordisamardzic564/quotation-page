@@ -151,6 +151,9 @@ export default function QuotationView({ data }: QuotationViewProps) {
           offerte_id: data.name, // Het S-nummer (bijv. S00290) voor Odoo lookup
           event: eventName,
           timestamp: new Date().toISOString(),
+          klant_naam: data.klant_naam,
+          voertuig: data.voertuig,
+          totaal_bedrag: data.totaal_excl,
           extra: {
             url: typeof window !== 'undefined' ? window.location.href : '',
             referrer: typeof document !== 'undefined' ? document.referrer : '',
@@ -163,9 +166,54 @@ export default function QuotationView({ data }: QuotationViewProps) {
     }
   };
 
-  // Track pagina bezoek bij laden
+  // Track pagina bezoek bij laden en tijdsduur
   useEffect(() => {
     trackEvent('pagina_bezocht');
+
+    const startTime = Date.now();
+    let pingsSent = 0;
+
+    // Functie om tijd te sturen
+    const sendTimeUpdate = () => {
+      const durationSeconds = Math.round((Date.now() - startTime) / 1000);
+      trackEvent('tijd_op_pagina', { duur_seconden: durationSeconds });
+    };
+
+    // Stuur updates bij specifieke intervallen: 30s, 1m, 2m, 5m
+    const interval = setInterval(() => {
+      const duration = (Date.now() - startTime) / 1000;
+      
+      if (duration > 30 && pingsSent === 0) { sendTimeUpdate(); pingsSent++; }
+      else if (duration > 60 && pingsSent === 1) { sendTimeUpdate(); pingsSent++; }
+      else if (duration > 120 && pingsSent === 2) { sendTimeUpdate(); pingsSent++; }
+      else if (duration > 300 && pingsSent === 3) { sendTimeUpdate(); pingsSent++; }
+    }, 5000);
+
+    // Probeer ook bij verlaten een signaal te sturen (beacon API is betrouwbaarder bij unload)
+    const handleUnload = () => {
+       const durationSeconds = Math.round((Date.now() - startTime) / 1000);
+       const blob = new Blob([JSON.stringify({
+          offerte_id: data.name,
+          event: 'pagina_verlaten',
+          timestamp: new Date().toISOString(),
+          klant_naam: data.klant_naam,
+          voertuig: data.voertuig,
+          totaal_bedrag: data.totaal_excl,
+          extra: { 
+            url: window.location.href,
+            duur_seconden: durationSeconds 
+          }
+       })], { type: 'application/json' });
+       
+       navigator.sendBeacon('/api/track-event', blob);
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('beforeunload', handleUnload);
+    };
   }, []);
 
   // === COUNTDOWN LOGIC ===
