@@ -597,17 +597,33 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none" />
                     
                     <div className="relative z-10">
-                        <div className="flex justify-between items-end mb-4">
-                            <span className="text-[#666] font-mono uppercase text-sm">Order Value (Excl.)</span>
-                            <span className="text-2xl font-mono text-[#EDEDED] decoration-slice decoration-1 underline decoration-[#333] underline-offset-4">
+                        <div className="flex justify-between items-end mb-2">
+                            <span className="text-[#666] font-mono uppercase text-sm">Total Excl. VAT</span>
+                            <span className="text-xl font-mono text-[#EDEDED] decoration-slice decoration-1 underline decoration-[#333] underline-offset-4">
                                 {formatCurrency(data.totaal_excl, data.valuta)}
                             </span>
                         </div>
+
+                        {data.has_tax && (
+                          <div className="flex justify-between items-end mb-8 border-b border-[#333] pb-4">
+                              <span className="text-[#444] font-mono uppercase text-xs">Total Incl. VAT</span>
+                              <span className="text-sm font-mono text-[#888]">
+                                  {formatCurrency(data.totaal_incl, data.valuta)}
+                              </span>
+                          </div>
+                        )}
                         
                         <div className="flex justify-between items-end mb-12">
-                            <span className="text-[#D4F846] font-mono uppercase text-sm font-bold">
-                                {paymentLabel}
-                            </span>
+                            <div className="flex flex-col">
+                                <span className="text-[#D4F846] font-mono uppercase text-sm font-bold">
+                                    {isFullPayment ? "Total Due (Incl. VAT)" : "30% Deposit (Incl. VAT)"}
+                                </span>
+                                {!isFullPayment && (
+                                    <span className="text-[10px] text-[#666] font-mono mt-1">
+                                        Balance due before shipping
+                                    </span>
+                                )}
+                            </div>
                             <span className="text-5xl md:text-6xl font-extended text-[#D4F846] tracking-tighter">
                                 {formatCurrency(data.aanbetaling, data.valuta)}
                             </span>
