@@ -168,6 +168,8 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
   // Track pagina bezoek bij laden en exit
   useEffect(() => {
+    if (!data) return;
+
     // 1. Melding bij OPENEN
     trackEvent('pagina_bezocht');
 
@@ -221,7 +223,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
       window.removeEventListener('pagehide', handlePageHide);
       window.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [data]);
 
   // === COUNTDOWN LOGIC ===
   const [timeLeft, setTimeLeft] = useState<string>('');
