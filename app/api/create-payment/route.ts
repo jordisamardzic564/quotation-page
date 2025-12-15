@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { offerte_id } = body;
+    const { offerte_id, uuid } = body;
 
     // Check if N8N_BASE_URL is configured
     const n8nBase = process.env.N8N_BASE_URL;
@@ -18,8 +18,9 @@ export async function POST(request: Request) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
             offerte_id,
+            uuid,
             // Dynamisch de return URL bepalen
-            return_url: `${request.headers.get('origin')}/offerte/${offerte_id}?status=success`
+            return_url: `${request.headers.get('origin')}/${uuid}?status=success`
         })
     });
 
@@ -37,4 +38,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create payment' }, { status: 500 });
   }
 }
-

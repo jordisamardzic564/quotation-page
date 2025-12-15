@@ -11,6 +11,7 @@ export interface Product {
 }
 
 export interface Quotation {
+  uuid?: string; // Toegevoegd voor UUID ondersteuning
   offerte_id: number;
   name: string;
   offerte_url: string;
@@ -27,4 +28,3 @@ export interface Quotation {
   has_tax?: boolean;
   totaal_incl?: number;
 }
-

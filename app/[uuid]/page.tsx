@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
-async function getOfferteIdFallback(): Promise<string | undefined> {
+async function getUuidFallback(): Promise<string | undefined> {
   const h = await headers();
   const raw =
     h.get("x-vercel-forwarded-url") ||
@@ -27,9 +27,9 @@ async function getOfferteIdFallback(): Promise<string | undefined> {
   return undefined;
 }
 
-async function getQuotation(offerteId: string | undefined): Promise<Quotation | null> {
-  if (!offerteId) {
-    console.error("offerte_id is missing");
+async function getQuotation(uuid: string | undefined): Promise<Quotation | null> {
+  if (!uuid) {
+    console.error("uuid is missing");
     return null;
   }
 
@@ -39,10 +39,11 @@ async function getQuotation(offerteId: string | undefined): Promise<Quotation | 
     return null;
   }
 
-  const url = `${base.replace(/\/$/, "")}/webhook/offerte?offerte_id=${encodeURIComponent(offerteId)}`;
+  // We zoeken nu op UUID in plaats van offerte_id
+  const url = `${base.replace(/\/$/, "")}/webhook/offerte?uuid=${encodeURIComponent(uuid)}`;
 
   try {
-    console.log("Fetching offerte", { offerteId, url });
+    console.log("Fetching offerte", { uuid, url });
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) {
       console.error("Fetch failed", res.status, res.statusText);
@@ -80,21 +81,21 @@ export default async function OffertePage({
   params,
   searchParams,
 }: {
-  params: Promise<{ offerte_id: string }>;
+  params: Promise<{ uuid: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
 
-  let offerteId =
-    resolvedParams.offerte_id ||
-    (typeof resolvedSearchParams?.offerte_id === "string"
-      ? resolvedSearchParams.offerte_id
+  let uuid =
+    resolvedParams.uuid ||
+    (typeof resolvedSearchParams?.uuid === "string"
+      ? resolvedSearchParams.uuid
       : undefined) ||
-    (await getOfferteIdFallback());
+    (await getUuidFallback());
 
   // VEILIGHEIDSCHECK: Voorkom dat systeembestanden als ID worden gezien
-  if (offerteId === 'favicon.ico' || offerteId === 'robots.txt' || offerteId === 'sitemap.xml') {
+  if (uuid === 'favicon.ico' || uuid === 'robots.txt' || uuid === 'sitemap.xml') {
     return null;
   }
 
@@ -116,14 +117,14 @@ export default async function OffertePage({
     console.log("Header debug failed", e);
   }
 
-  const quotation = await getQuotation(offerteId);
+  const quotation = await getQuotation(uuid);
 
   if (!quotation) {
     return (
       <main className="min-h-screen flex items-center justify-center text-white">
         <div className="text-center space-y-3">
           <h1 className="text-2xl font-bold">Offerte niet gevonden</h1>
-          <p className="text-sm text-gray-400">Controleer het offerte ID.</p>
+          <p className="text-sm text-gray-400">Controleer de link of neem contact op.</p>
         </div>
       </main>
     );

@@ -260,15 +260,46 @@ export default function QuotationView({ data }: QuotationViewProps) {
   const mainProduct = wheelProducts[0];
   const parsedMainProduct = parseProduct(mainProduct);
 
-  // State alleen nog voor laden van betaling
-  const [isLoading, setIsLoading] = useState(false);
+  // === LANGUAGE DETECTION ===
+  const [language, setLanguage] = useState<'en' | 'nl'>('en'); // Default Engels
 
-  // Bepaal labels op basis van data uit backend
-  // Als payment_mode niet is meegegeven, vallen we terug op 'deposit' als veilige optie, of checken we of aanbetaling < totaal
-  const isFullPayment = data.payment_mode === 'full' || (data.aanbetaling >= data.totaal_excl);
-  
-  const paymentLabel = isFullPayment ? "Total Amount Due" : "Deposit Required";
-  const buttonText = isFullPayment ? "Complete Payment" : "Secure Allocation";
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.language.startsWith('nl')) {
+      setLanguage('nl');
+    }
+  }, []);
+
+  // Teksten op basis van taal
+  const t = {
+    paymentTitle: language === 'nl' 
+      ? (isFullPayment ? 'Rond uw bestelling af' : 'Productie Slot Reserveren')
+      : (isFullPayment ? 'Complete Your Order' : 'Production Slot'),
+    
+    paymentDesc: language === 'nl'
+      ? (isFullPayment 
+          ? `Uw configuratie is goedgekeurd. Voldoe de volledige betaling van ${formatCurrency(data.aanbetaling, data.valuta)} om de productie te starten.`
+          : `Uw configuratie staat klaar. Vanwege de grote vraag naar ${mainProduct.size} ruwe forgings vragen wij een aanbetaling van ${formatCurrency(data.aanbetaling, data.valuta)} om uw plek in de freesrij te reserveren.`)
+      : (isFullPayment 
+          ? `Your configuration is approved. Please complete the full payment of ${formatCurrency(data.aanbetaling, data.valuta)} to proceed directly to production.`
+          : `Your configuration is ready. Due to high demand for the ${mainProduct.size} raw forgings, we require a deposit of ${formatCurrency(data.aanbetaling, data.valuta)} to secure your allocation in the milling queue.`),
+    
+    totalExcl: language === 'nl' ? "Totaal Excl. BTW" : "Total Excl. VAT",
+    totalIncl: language === 'nl' ? "Totaal Incl. BTW" : "Total Incl. VAT",
+    totalDue: language === 'nl' 
+      ? (isFullPayment ? "Totaal te voldoen (Incl. BTW)" : "30% Aanbetaling (Incl. BTW)")
+      : (isFullPayment ? "Total Due (Incl. VAT)" : "30% Deposit (Incl. VAT)"),
+    
+    balanceDue: language === 'nl' ? "Restbedrag te voldoen voor levering" : "Balance due before shipping",
+    
+    buttonText: language === 'nl'
+      ? (isFullPayment ? "Betaling Voldoen" : "Productieplaats Veiligstellen")
+      : (isFullPayment ? "Complete Payment" : "Secure Allocation"),
+      
+    verifiedBy: language === 'nl' ? "Geverifieerd door" : "Verified by",
+    terms: language === 'nl' 
+      ? "Door verder te gaan accepteert u onze technische voorwaarden."
+      : "By proceeding you accept our engineering terms & conditions."
+  };
 
   const handlePayment = async () => {
     // Track dat er op de knop is geklikt
@@ -283,7 +314,9 @@ export default function QuotationView({ data }: QuotationViewProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          offerte_id: data.offerte_id
+          offerte_id: data.offerte_id,
+          uuid: data.uuid,
+          locale: language === 'nl' ? 'nl_NL' : 'en_US' // Stuur taal mee naar n8n
           // Geen keuze meer meesturen, backend is leidend
         }),
       });
@@ -654,13 +687,10 @@ export default function QuotationView({ data }: QuotationViewProps) {
             
             <div className="lg:col-span-6">
                 <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>
-                    {isFullPayment ? 'Complete Your Order' : 'Production Slot'}
+                    {t.paymentTitle}
                 </h3>
                 <p className="text-[#888] max-w-lg mb-8">
-                    {isFullPayment 
-                        ? `Your configuration is approved. Please complete the full payment of ${formatCurrency(data.aanbetaling, data.valuta)} to proceed directly to production.`
-                        : `Your configuration is ready. Due to high demand for the ${mainProduct.size} raw forgings, we require a deposit of ${formatCurrency(data.aanbetaling, data.valuta)} to secure your allocation in the milling queue.`
-                    }
+                    {t.paymentDesc}
                 </p>
                 <div className="flex items-center gap-4 text-xs font-mono text-[#666]">
                     <div className="flex items-center gap-2">
@@ -688,7 +718,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     
                     <div className="relative z-10">
                         <div className="flex justify-between items-end mb-2">
-                            <span className="text-[#666] font-mono uppercase text-sm">Total Excl. VAT</span>
+                            <span className="text-[#666] font-mono uppercase text-sm">{t.totalExcl}</span>
                             <span className="text-xl font-mono text-[#EDEDED] decoration-slice decoration-1 underline decoration-[#333] underline-offset-4">
                                 {formatCurrency(data.totaal_excl, data.valuta)}
                             </span>
@@ -696,7 +726,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
                         {data.has_tax && (
                           <div className="flex justify-between items-end mb-8 border-b border-[#333] pb-4">
-                              <span className="text-[#444] font-mono uppercase text-xs">Total Incl. VAT</span>
+                              <span className="text-[#444] font-mono uppercase text-xs">{t.totalIncl}</span>
                               <span className="text-sm font-mono text-[#888]">
                                   {formatCurrency(data.totaal_incl ?? 0, data.valuta)}
                               </span>
@@ -706,11 +736,11 @@ export default function QuotationView({ data }: QuotationViewProps) {
                         <div className="flex justify-between items-end mb-12">
                             <div className="flex flex-col">
                                 <span className="text-[#D4F846] font-mono uppercase text-sm font-bold">
-                                    {isFullPayment ? "Total Due (Incl. VAT)" : "30% Deposit (Incl. VAT)"}
+                                    {t.totalDue}
                                 </span>
                                 {!isFullPayment && (
                                     <span className="text-[10px] text-[#666] font-mono mt-1">
-                                        Balance due before shipping
+                                        {t.balanceDue}
                                     </span>
                                 )}
                             </div>
@@ -729,7 +759,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                                     : "bg-[#D4F846] text-black hover:bg-white active:scale-[0.99] cursor-pointer disabled:opacity-70 disabled:cursor-wait"
                             )}
                         >
-                            {isExpired ? 'OFFER EXPIRED' : (isLoading ? 'Processing...' : buttonText)}
+                            {isExpired ? 'OFFER EXPIRED' : (isLoading ? 'Processing...' : t.buttonText)}
                             {!isLoading && !isExpired && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                             {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
                         </button>
@@ -748,14 +778,14 @@ export default function QuotationView({ data }: QuotationViewProps) {
                             </div>
 
                             <div className="mt-4 pt-4 border-t border-[#333] w-full text-center">
-                                <div className="text-[10px] text-[#444] font-mono uppercase tracking-widest mb-1">Verified by</div>
+                                <div className="text-[10px] text-[#444] font-mono uppercase tracking-widest mb-1">{t.verifiedBy}</div>
                                 <div className="text-xs text-[#888] font-bold uppercase" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>Vincent Pedroli</div>
                                 <div className="text-[9px] text-[#D4F846] font-mono">Fitment Specialist</div>
                             </div>
                         </div>
 
                         <p className="text-center mt-6 text-[#444] text-[10px] font-mono uppercase">
-                            By proceeding you accept our engineering terms & conditions.
+                            {t.terms}
                         </p>
                     </div>
                 </div>
