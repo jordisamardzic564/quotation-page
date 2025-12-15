@@ -641,7 +641,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                           <div className="flex justify-between items-end mb-8 border-b border-[#333] pb-4">
                               <span className="text-[#444] font-mono uppercase text-xs">Total Incl. VAT</span>
                               <span className="text-sm font-mono text-[#888]">
-                                  {formatCurrency(data.totaal_incl, data.valuta)}
+                                  {formatCurrency(data.totaal_incl ?? 0, data.valuta)}
                               </span>
                           </div>
                         )}
