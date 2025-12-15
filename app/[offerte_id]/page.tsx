@@ -18,8 +18,9 @@ async function getOfferteIdFallback(): Promise<string | undefined> {
   try {
     const u = new URL(raw);
     const parts = u.pathname.split("/").filter(Boolean);
-    const idx = parts.indexOf("offerte");
-    if (idx >= 0 && parts[idx + 1]) return parts[idx + 1];
+    // Omdat we nu in de root zitten (/[id]), is het laatste deel van het path waarschijnlijk de ID.
+    // We pakken het laatste deel, mits het niet leeg is.
+    if (parts.length > 0) return parts[parts.length - 1];
   } catch {
     // ignore parse errors
   }
@@ -85,12 +86,17 @@ export default async function OffertePage({
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
 
-  const offerteId =
+  let offerteId =
     resolvedParams.offerte_id ||
     (typeof resolvedSearchParams?.offerte_id === "string"
       ? resolvedSearchParams.offerte_id
       : undefined) ||
     (await getOfferteIdFallback());
+
+  // VEILIGHEIDSCHECK: Voorkom dat systeembestanden als ID worden gezien
+  if (offerteId === 'favicon.ico' || offerteId === 'robots.txt' || offerteId === 'sitemap.xml') {
+    return null;
+  }
 
   // Debug logging to trace missing params in Vercel
   try {
