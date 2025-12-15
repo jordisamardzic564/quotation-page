@@ -166,32 +166,22 @@ export default function QuotationView({ data }: QuotationViewProps) {
     }
   };
 
-  // Track pagina bezoek bij laden en tijdsduur
+  // Track pagina bezoek bij laden en exit
   useEffect(() => {
+    // 1. Melding bij OPENEN
     trackEvent('pagina_bezocht');
 
     const startTime = Date.now();
-    let pingsSent = 0;
-
-    // Functie om tijd te sturen
-    const sendTimeUpdate = () => {
-      const durationSeconds = Math.round((Date.now() - startTime) / 1000);
-      trackEvent('tijd_op_pagina', { duur_seconden: durationSeconds });
-    };
-
-    // Stuur updates bij specifieke intervallen: 30s, 1m, 2m, 5m
-    const interval = setInterval(() => {
-      const duration = (Date.now() - startTime) / 1000;
-      
-      if (duration > 30 && pingsSent === 0) { sendTimeUpdate(); pingsSent++; }
-      else if (duration > 60 && pingsSent === 1) { sendTimeUpdate(); pingsSent++; }
-      else if (duration > 120 && pingsSent === 2) { sendTimeUpdate(); pingsSent++; }
-      else if (duration > 300 && pingsSent === 3) { sendTimeUpdate(); pingsSent++; }
-    }, 5000);
-
-    // Probeer ook bij verlaten een signaal te sturen (beacon API is betrouwbaarder bij unload)
-    const handleUnload = () => {
+    
+    // Functie voor exit tracking
+    const sendExitSignal = () => {
+       // Check of we al gestuurd hebben om dubbele meldingen te voorkomen
+       if ((window as any).hasSentExit) return;
+       
        const durationSeconds = Math.round((Date.now() - startTime) / 1000);
+       // Alleen sturen als ze langer dan 5 seconden keken
+       if (durationSeconds < 5) return;
+
        const blob = new Blob([JSON.stringify({
           offerte_id: data.name,
           event: 'pagina_verlaten',
@@ -205,14 +195,31 @@ export default function QuotationView({ data }: QuotationViewProps) {
           }
        })], { type: 'application/json' });
        
-       navigator.sendBeacon('/api/track-event', blob);
+       // Beacon is essentieel voor exit tracking
+       const success = navigator.sendBeacon('/api/track-event', blob);
+       if (success) {
+           (window as any).hasSentExit = true;
+       }
     };
 
-    window.addEventListener('beforeunload', handleUnload);
+    // 2. Trigger bij sluiten/navigeren
+    const handlePageHide = () => {
+        sendExitSignal();
+    };
+
+    // 3. Trigger bij tab naar achtergrond (mobiel vriendelijk)
+    const handleVisibilityChange = () => {
+        if (document.visibilityState === 'hidden') {
+            sendExitSignal();
+        }
+    };
+
+    window.addEventListener('pagehide', handlePageHide);
+    window.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      clearInterval(interval);
-      window.removeEventListener('beforeunload', handleUnload);
+      window.removeEventListener('pagehide', handlePageHide);
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
