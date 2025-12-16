@@ -6,15 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Check, 
   ShieldCheck, 
-  Truck, 
-  Wrench, 
-  Nut, 
   Disc, 
   Lock,
-  Star,
-  ChevronRight,
-  Info,
-  Crosshair,
   ArrowRight,
   Loader2
 } from 'lucide-react';
@@ -87,10 +80,6 @@ const getConcaveName = (level: number) => {
   }
 };
 
-const getConcaveBadge = (et: number | null) => {
-  return getConcaveName(getConcaveLevel(et));
-};
-
 const parseProduct = (product: Product) => {
   const parts = product.product_naam.split('\n');
   let title = parts[0];
@@ -104,6 +93,23 @@ const parseProduct = (product: Product) => {
   }
 
   return { title, description, code };
+};
+
+// Detectie of een product een velg is
+const isWheelProduct = (product: Product) => {
+  // 1. Check op size property
+  if (product.size && product.size.trim().length > 0) return true;
+  
+  const name = product.product_naam.toLowerCase();
+  
+  // 2. Check op "inch"
+  if (name.includes('inch')) return true;
+
+  // 3. Check op "J x" patroon of "ET" waarde
+  if (/[\d\.]+[Jj]?\s*[xX]\s*\d+/.test(product.product_naam)) return true;
+  if (/ET\s*-?\d+/i.test(product.product_naam)) return true;
+  
+  return false;
 };
 
 // Animation variants
@@ -127,77 +133,72 @@ const itemVariants = {
   }
 };
 
-const Separator = () => (
-  <div className="h-px w-full bg-[#333] my-0" />
-);
+type EnrichedProduct = Product & {
+  isWheel: boolean;
+  concaveProfile?: string | null;
+  parsed: { title: string; description: string; code: string };
+};
 
 export default function QuotationView({ data }: QuotationViewProps) {
-  const { wheelProducts, accessoryProducts } = useMemo(() => {
-    const wheels: Product[] = [];
-    const others: Product[] = [];
+  // === DATA PREPARATION ===
+  // We verwerken de productenlijst één keer om te bepalen wat velgen zijn en wat niet.
+  // We behouden de originele volgorde van Odoo voor de weergave in de tabel.
+  const { enrichedProducts, wheelProducts } = useMemo(() => {
+    // 1. Identificeer velgen en parse data
+    const tempProducts = data.producten.map(p => ({
+      ...p,
+      isWheel: isWheelProduct(p),
+      parsed: parseProduct(p)
+    }));
 
-    data.producten.forEach((p, i) => {
-      // Logic:
-      // 1. First item is always a main wheel product.
-      // 2. Second item is a main wheel product if it has a size OR looks like a wheel in the name.
-      const isWheelLike = (prod: Product) => {
-        if (prod.size && prod.size.trim().length > 0) return true;
-        // Check for patterns like "8.5J x 20", "20x8.5", "ET25"
-        return (
-          /[\d\.]+[Jj]?\s*[xX]\s*\d+/.test(prod.product_naam) ||
-          /ET\s*-?\d+/i.test(prod.product_naam)
-        );
-      };
+    // 2. Isoleer de velgen voor concave berekening
+    const wheels = tempProducts.filter(p => p.isWheel);
 
-      if (i === 0) {
-        wheels.push(p);
-      } else if (i === 1 && isWheelLike(p)) {
-        wheels.push(p);
-      } else {
-        others.push(p);
-      }
-    });
-
-    return { wheelProducts: wheels, accessoryProducts: others };
-  }, [data.producten]);
-
-  // === CONCAVE LOGIC ===
-  // Bereken concave profielen met logica: Voor mag niet dieper zijn dan Achter
-  const wheelConcaveProfiles = useMemo(() => {
-    // Eerst alle levels berekenen
-    const levels = wheelProducts.map((wheel) => {
-      const parsed = parseProduct(wheel);
-      const et = extractEtValue(wheel, parsed);
+    // 3. Bereken concave levels voor de velgen
+    const levels = wheels.map((wheel) => {
+      const et = extractEtValue(wheel, wheel.parsed);
       return getConcaveLevel(et);
     });
 
-    // Als we precies 2 wielen hebben (Voor & Achter set), pas logica toe
-    // Aanname: index 0 = Voor, index 1 = Achter
+    // Concave Logica: index 0 = Voor, index 1 = Achter (indien precies 2 velgen)
+    // Als achteras een geldige ET heeft (level > 0)
+    // En vooras is dieper dan achteras (hoger level)
+    // Dan vooras downgraden naar achteras level
     if (levels.length === 2) {
       const frontLevel = levels[0];
       const rearLevel = levels[1];
-
-      // Als achteras een geldige ET heeft (level > 0)
-      // En vooras is dieper dan achteras (hoger level)
-      // Dan vooras downgraden naar achteras level
       if (rearLevel > 0 && frontLevel > rearLevel) {
         levels[0] = rearLevel;
       }
     }
 
-    // Zet levels om naar namen
-    return levels.map(getConcaveName);
-  }, [wheelProducts]);
+    const concaveNames = levels.map(getConcaveName);
+
+    // 4. Voeg concave profielen toe aan de originele productenlijst (alleen bij de velgen)
+    let wheelIndex = 0;
+    const finalProducts: EnrichedProduct[] = tempProducts.map(p => {
+      if (p.isWheel) {
+        const profile = concaveNames[wheelIndex];
+        wheelIndex++;
+        return { ...p, concaveProfile: profile };
+      }
+      return p;
+    });
+
+    return { 
+      enrichedProducts: finalProducts, 
+      wheelProducts: wheels // Voor de Hero sectie
+    };
+  }, [data.producten]);
 
   // === TRACKING LOGIC ===
   const trackEvent = (eventName: string, metadata: Record<string, any> = {}) => {
-    // We gebruiken 'fire-and-forget' via onze eigen API route om CORS te vermijden
     try {
       fetch('/api/track-event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          offerte_id: data.name, // Het S-nummer (bijv. S00290) voor Odoo lookup
+          offerte_id: data.name,
           event: eventName,
           timestamp: new Date().toISOString(),
           klant_naam: data.klant_naam,
@@ -211,26 +212,18 @@ export default function QuotationView({ data }: QuotationViewProps) {
         }),
       }).catch(err => console.error('Tracking error:', err));
     } catch (e) {
-      // Negeer fouten om de UI niet te breken
+      // Negeer fouten
     }
   };
 
-  // Track pagina bezoek bij laden en exit
   useEffect(() => {
     if (!data) return;
-
-    // 1. Melding bij OPENEN
     trackEvent('pagina_bezocht');
 
     const startTime = Date.now();
-    
-    // Functie voor exit tracking
     const sendExitSignal = () => {
-       // Check of we al gestuurd hebben om dubbele meldingen te voorkomen
        if ((window as any).hasSentExit) return;
-       
        const durationSeconds = Math.round((Date.now() - startTime) / 1000);
-       // Alleen sturen als ze langer dan 5 seconden keken
        if (durationSeconds < 5) return;
 
        const blob = new Blob([JSON.stringify({
@@ -246,23 +239,15 @@ export default function QuotationView({ data }: QuotationViewProps) {
           }
        })], { type: 'application/json' });
        
-       // Beacon is essentieel voor exit tracking
        const success = navigator.sendBeacon('/api/track-event', blob);
        if (success) {
            (window as any).hasSentExit = true;
        }
     };
 
-    // 2. Trigger bij sluiten/navigeren
-    const handlePageHide = () => {
-        sendExitSignal();
-    };
-
-    // 3. Trigger bij tab naar achtergrond (mobiel vriendelijk)
+    const handlePageHide = () => sendExitSignal();
     const handleVisibilityChange = () => {
-        if (document.visibilityState === 'hidden') {
-            sendExitSignal();
-        }
+        if (document.visibilityState === 'hidden') sendExitSignal();
     };
 
     window.addEventListener('pagehide', handlePageHide);
@@ -281,7 +266,6 @@ export default function QuotationView({ data }: QuotationViewProps) {
   useEffect(() => {
     const calculateTimeLeft = () => {
       if (!data.geldig_tot) return;
-
       const validUntil = new Date(data.geldig_tot).getTime();
       const now = new Date().getTime();
       const difference = validUntil - now;
@@ -306,11 +290,10 @@ export default function QuotationView({ data }: QuotationViewProps) {
     return () => clearInterval(timer);
   }, [data.geldig_tot]);
 
-  const mainProduct = wheelProducts[0];
-  const parsedMainProduct = parseProduct(mainProduct);
-
+  const mainProduct = wheelProducts[0] || enrichedProducts[0]; // Fallback naar eerste product als er geen wielen zijn
+  
   // === LANGUAGE DETECTION ===
-  const [language, setLanguage] = useState<'en' | 'nl'>('en'); // Default Engels
+  const [language, setLanguage] = useState<'en' | 'nl'>('en');
 
   useEffect(() => {
     if (typeof navigator !== 'undefined' && navigator.language.startsWith('nl')) {
@@ -318,7 +301,9 @@ export default function QuotationView({ data }: QuotationViewProps) {
     }
   }, []);
 
-  // Teksten op basis van taal
+  const isFullPayment = data.payment_mode === 'full';
+  const [isLoading, setIsLoading] = useState(false);
+
   const t = {
     paymentTitle: language === 'nl' 
       ? (isFullPayment ? 'Rond uw bestelling af' : 'Productie Slot Reserveren')
@@ -327,10 +312,10 @@ export default function QuotationView({ data }: QuotationViewProps) {
     paymentDesc: language === 'nl'
       ? (isFullPayment 
           ? `Uw configuratie is goedgekeurd. Voldoe de volledige betaling van ${formatCurrency(data.aanbetaling, data.valuta)} om de productie te starten.`
-          : `Uw configuratie staat klaar. Vanwege de grote vraag naar ${mainProduct.size} ruwe forgings vragen wij een aanbetaling van ${formatCurrency(data.aanbetaling, data.valuta)} om uw plek in de freesrij te reserveren.`)
+          : `Uw configuratie staat klaar. Vanwege de grote vraag naar ${mainProduct.size || 'forged'} ruwe forgings vragen wij een aanbetaling van ${formatCurrency(data.aanbetaling, data.valuta)} om uw plek in de freesrij te reserveren.`)
       : (isFullPayment 
           ? `Your configuration is approved. Please complete the full payment of ${formatCurrency(data.aanbetaling, data.valuta)} to proceed directly to production.`
-          : `Your configuration is ready. Due to high demand for the ${mainProduct.size} raw forgings, we require a deposit of ${formatCurrency(data.aanbetaling, data.valuta)} to secure your allocation in the milling queue.`),
+          : `Your configuration is ready. Due to high demand for the ${mainProduct.size || 'forged'} raw forgings, we require a deposit of ${formatCurrency(data.aanbetaling, data.valuta)} to secure your allocation in the milling queue.`),
     
     totalExcl: language === 'nl' ? "Totaal Excl. BTW" : "Total Excl. VAT",
     totalIncl: language === 'nl' ? "Totaal Incl. BTW" : "Total Incl. VAT",
@@ -351,22 +336,19 @@ export default function QuotationView({ data }: QuotationViewProps) {
   };
 
   const handlePayment = async () => {
-    // Track dat er op de knop is geklikt
     trackEvent('click_op_knop', { 
       knop_type: isFullPayment ? 'complete_payment' : 'secure_allocation' 
     });
 
     setIsLoading(true);
     try {
-      // We sturen alleen ID, backend bepaalt bedrag/type
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           offerte_id: data.offerte_id,
           uuid: data.uuid,
-          locale: language === 'nl' ? 'nl_NL' : 'en_US' // Stuur taal mee naar n8n
-          // Geen keuze meer meesturen, backend is leidend
+          locale: language === 'nl' ? 'nl_NL' : 'en_US'
         }),
       });
 
@@ -387,20 +369,14 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
   // Intro State
   const [showIntro, setShowIntro] = useState(true);
-
-  // Intro tekst bepalen
-  // Gebruik altijd het name veld (S-nummer), nooit het interne database ID
   const displayId = data.name;
-
   const introLine1 = `Quotation ${displayId} personally curated for`;
   const introLine2 = data.klant_naam;
 
   useEffect(() => {
-    // Totale duur: Line 1 (2s) + Line 2 (1s) + Wait (1s) = 4s
     const timer = setTimeout(() => {
       setShowIntro(false);
     }, 4000);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -419,11 +395,9 @@ export default function QuotationView({ data }: QuotationViewProps) {
           >
             <div className="max-w-4xl text-center flex flex-col items-center">
                 <div className="mb-8">
-                    {/* Klein logo of icoon boven de tekst */}
                     <div className="w-2 h-2 bg-[#D4F846] mx-auto rounded-full animate-pulse" />
                 </div>
                 
-                {/* Text Animate Component - Line 1 */}
                 <TextAnimate 
                   animation="blurIn" 
                   by="character" 
@@ -434,7 +408,6 @@ export default function QuotationView({ data }: QuotationViewProps) {
                   {introLine1}
                 </TextAnimate>
 
-                {/* Text Animate Component - Line 2 (Name) */}
                 <TextAnimate 
                   animation="blurIn" 
                   by="character" 
@@ -469,9 +442,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
       <nav className="fixed top-0 w-full z-40 bg-[#161616]/90 backdrop-blur-sm border-b border-[#333]">
         <div className="max-w-[1280px] mx-auto px-4 md:px-12 lg:px-24 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
-             {/* Logo */}
              <div className="relative w-40 h-10">
-               {/* Place your logo file as 'logo.png' in the public folder */}
                <Image
                  src="/logo.png"
                  alt="KORBACH"
@@ -521,14 +492,13 @@ export default function QuotationView({ data }: QuotationViewProps) {
             {/* Left: The Visual */}
             <motion.div variants={itemVariants} className="relative order-2 lg:order-1">
                 <div className="relative w-full aspect-square max-w-2xl mx-auto p-8">
-                    {/* Decorative Ring */}
                     <div className="absolute inset-0 border border-[#222] rounded-full opacity-20 scale-110" />
                     <div className="absolute inset-0 border border-dashed border-[#333] rounded-full opacity-20 scale-125 animate-spin-slow duration-[60s]" />
                     
                     {mainProduct.afbeelding ? (
                         <Image 
                             src={mainProduct.afbeelding} 
-                            alt={parsedMainProduct.title}
+                            alt={mainProduct.parsed.title}
                             fill
                             className="object-contain drop-shadow-2xl z-10 rounded-2xl"
                             priority
@@ -540,15 +510,11 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     )}
                 </div>
                 
-                 {/* Technical Overlay Label */}
+                 {/* Technical Overlay Label for Wheels */}
                  <div className="absolute bottom-4 left-4 bg-[#161616]/90 backdrop-blur-md border border-[#333] p-4 max-w-xs z-20 rounded-sm">
                     <div className="text-[10px] text-[#666] uppercase font-mono mb-1">Spec.</div>
                     {wheelProducts.map((wheel, i) => {
                       const parsed = parseProduct(wheel);
-                      // Try to extract ET value from description or title if not in size
-                      // Assuming size is like "10.5J x 23" and doesn't contain ET
-                      // If size already contains ET, we might duplicate it, so careful.
-                      // Regex to find ET value: ET20, ET 20, et20
                       const etMatch =
                         parsed.description.match(/ET\s*-?\d+/i) ||
                         parsed.title.match(/ET\s*-?\d+/i);
@@ -626,7 +592,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
         </section>
 
 
-        {/* Configuration List - Horizontal Tech Rows */}
+        {/* Configuration List - Single List Preserving Order */}
         <section className="mb-32">
             <div className="flex items-end justify-between mb-8 border-b border-[#333] pb-4">
                 <h2 className="uppercase tracking-wide" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Build Configuration</h2>
@@ -642,57 +608,50 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     <div className="col-span-2 text-right">Value</div>
                 </div>
 
-                {/* Main Product Rows (Wheels) */}
-                {wheelProducts.map((wheel, index) => {
-                  const parsed = parseProduct(wheel);
-                  const concaveProfile = wheelConcaveProfiles[index];
-                  return (
-                    <motion.div
-                      key={wheel.product_id}
-                      variants={itemVariants}
-                      className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-8 border-b border-[#333] hover:border-[#D4F846] transition-colors relative"
-                    >
-                      {/* Hover Glow */}
-                      <div className="absolute inset-0 bg-[#D4F846] opacity-0 group-hover:opacity-[0.02] transition-opacity pointer-events-none" />
+                {/* All Products in Original Order */}
+                {enrichedProducts.map((product) => {
+                  if (product.isWheel) {
+                    // === WHEEL / MAIN PRODUCT STYLING ===
+                    return (
+                      <motion.div
+                        key={product.product_id}
+                        variants={itemVariants}
+                        className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-8 border-b border-[#333] hover:border-[#D4F846] transition-colors relative"
+                      >
+                        <div className="absolute inset-0 bg-[#D4F846] opacity-0 group-hover:opacity-[0.02] transition-opacity pointer-events-none" />
 
-                      <div className="col-span-12 md:col-span-2 font-mono text-[#D4F846] text-xs">
-                        {parsed.code || "WHEEL-SET"}
-                      </div>
-                      <div className="col-span-12 md:col-span-6">
-                        <h3
-                          className="text-xl font-bold uppercase mb-2"
-                          style={{
-                            fontFamily: "Ppmonumentextended, sans-serif",
-                          }}
-                        >
-                          {parsed.title}
-                        </h3>
-                        <p className="text-[#888] text-sm leading-relaxed">
-                          {parsed.description}
-                        </p>
-                        {concaveProfile && (
-                          <div className="flex gap-4 mt-4">
-                            <span className="text-xs font-mono bg-[#0f0f0f] px-3 py-1 border border-[#333] text-[#D4F846] uppercase tracking-wider">
-                              {concaveProfile} Concave
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] flex items-start justify-end">
-                        {wheel.quantity}
-                      </div>
-                      <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] text-lg">
-                        {formatCurrency(wheel.prijs_per_stuk, data.valuta)}
-                      </div>
-                    </motion.div>
-                  );
-                })}
-
-                {/* Other Products Rows */}
-                {accessoryProducts.map((product) => {
-                    const parsed = parseProduct(product);
+                        <div className="col-span-12 md:col-span-2 font-mono text-[#D4F846] text-xs">
+                          {product.parsed.code || "WHEEL-SET"}
+                        </div>
+                        <div className="col-span-12 md:col-span-6">
+                          <h3
+                            className="text-xl font-bold uppercase mb-2"
+                            style={{ fontFamily: "Ppmonumentextended, sans-serif" }}
+                          >
+                            {product.parsed.title}
+                          </h3>
+                          <p className="text-[#888] text-sm leading-relaxed">
+                            {product.parsed.description}
+                          </p>
+                          {product.concaveProfile && (
+                            <div className="flex gap-4 mt-4">
+                              <span className="text-xs font-mono bg-[#0f0f0f] px-3 py-1 border border-[#333] text-[#D4F846] uppercase tracking-wider">
+                                {product.concaveProfile} Concave
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] flex items-start justify-end">
+                          {product.quantity}
+                        </div>
+                        <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] text-lg">
+                          {formatCurrency(product.prijs_per_stuk, data.valuta)}
+                        </div>
+                      </motion.div>
+                    );
+                  } else {
+                    // === ACCESSORY / STANDARD PRODUCT STYLING ===
                     const isIncluded = product.prijs_per_stuk === 0;
-
                     return (
                         <motion.div 
                             key={product.product_id}
@@ -700,16 +659,16 @@ export default function QuotationView({ data }: QuotationViewProps) {
                             className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-6 border-b border-[#333] hover:border-[#D4F846] transition-colors items-center relative"
                         >
                             <div className="col-span-12 md:col-span-2 font-mono text-[#666] text-xs group-hover:text-[#D4F846] transition-colors">
-                                {parsed.code || 'ENG-OPT'}
+                                {product.parsed.code || 'ENG-OPT'}
                             </div>
                             <div className="col-span-12 md:col-span-6">
                                 <h4
                                   className="font-bold text-sm uppercase mb-1"
                                   style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
                                 >
-                                  {parsed.title}
+                                  {product.parsed.title}
                                 </h4>
-                                <p className="text-[#666] text-xs font-mono">{parsed.description}</p>
+                                <p className="text-[#666] text-xs font-mono">{product.parsed.description}</p>
                             </div>
                             <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] text-sm">
                                 {product.quantity}
@@ -724,13 +683,14 @@ export default function QuotationView({ data }: QuotationViewProps) {
                                 )}
                             </div>
                         </motion.div>
-                    )
+                    );
+                  }
                 })}
             </div>
         </section>
 
 
-        {/* Conversion / Payment Section - NU EERST */}
+        {/* Conversion / Payment Section */}
         <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-[#333] pt-12 mb-32">
             
             <div className="lg:col-span-6">
