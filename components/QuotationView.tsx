@@ -63,10 +63,11 @@ const CONCAVE_LEVELS = {
 
 const getConcaveLevel = (et: number | null) => {
   if (et === null) return 0;
-  if (et >= 41 && et <= 80) return CONCAVE_LEVELS.PERFORMANCE;
+  // Let op: Lagere ET waarde = dieper concave = hoger level getal
+  if (et >= 41 && et <= 100) return CONCAVE_LEVELS.PERFORMANCE; // Ondiep
   if (et >= 31 && et <= 40) return CONCAVE_LEVELS.MEDIUM;
   if (et >= 21 && et <= 30) return CONCAVE_LEVELS.DEEP;
-  if (et >= 0 && et <= 20) return CONCAVE_LEVELS.SUPER_DEEP;
+  if (et <= 20) return CONCAVE_LEVELS.SUPER_DEEP; // Diepst
   return 0;
 };
 
@@ -160,15 +161,39 @@ export default function QuotationView({ data }: QuotationViewProps) {
       return getConcaveLevel(et);
     });
 
-    // Concave Logica: index 0 = Voor, index 1 = Achter (indien precies 2 velgen)
-    // Als achteras een geldige ET heeft (level > 0)
-    // En vooras is dieper dan achteras (hoger level)
-    // Dan vooras downgraden naar achteras level
+    // Helper om width uit te lezen (bijv "9.00J")
+    const getWidth = (product: Product) => {
+      const match = product.size?.match(/([\d\.]+)[Jj]/);
+      return match ? parseFloat(match[1]) : 0;
+    };
+
+    // Concave Logica:
+    // We moeten zeker weten wat voor en achter is.
+    // Normaal is index 0 = Voor, index 1 = Achter.
+    // Maar check voor zekerheid op breedte: smalste is voor.
+    let frontIndex = 0;
+    let rearIndex = 1;
+
     if (levels.length === 2) {
-      const frontLevel = levels[0];
-      const rearLevel = levels[1];
+      const width0 = getWidth(wheels[0]);
+      const width1 = getWidth(wheels[1]);
+
+      if (width0 > 0 && width1 > 0) {
+        if (width1 < width0) {
+          // Index 1 is smaller -> Front
+          frontIndex = 1;
+          rearIndex = 0;
+        }
+      }
+
+      const frontLevel = levels[frontIndex];
+      const rearLevel = levels[rearIndex];
+      
+      // REGEL: Vooras (front) mag NOOIT dieper zijn dan achteras (rear).
+      // Hogere level = dieper.
+      // Dus: Front level cappen op Rear level.
       if (rearLevel > 0 && frontLevel > rearLevel) {
-        levels[0] = rearLevel;
+        levels[frontIndex] = rearLevel;
       }
     }
 
@@ -180,9 +205,10 @@ export default function QuotationView({ data }: QuotationViewProps) {
       if (p.isWheel) {
         const profile = concaveNames[wheelIndex];
         wheelIndex++;
-        return { ...p, concaveProfile: profile };
+        // Extra check om undefined/null op te vangen
+        return { ...p, concaveProfile: profile || null };
       }
-      return p;
+      return { ...p, concaveProfile: null };
     });
 
     // 5. Sorteer: Velgen altijd eerst, daarna de rest. Behoud originele volgorde binnen groepen.
