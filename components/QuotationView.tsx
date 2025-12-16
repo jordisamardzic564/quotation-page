@@ -185,8 +185,14 @@ export default function QuotationView({ data }: QuotationViewProps) {
       return p;
     });
 
+    // 5. Sorteer: Velgen altijd eerst, daarna de rest. Behoud originele volgorde binnen groepen.
+    const sortedProducts = [
+      ...finalProducts.filter(p => p.isWheel),
+      ...finalProducts.filter(p => !p.isWheel)
+    ];
+
     return { 
-      enrichedProducts: finalProducts, 
+      enrichedProducts: sortedProducts, 
       wheelProducts: wheels // Voor de Hero sectie
     };
   }, [data.producten]);
