@@ -713,21 +713,62 @@ export default function QuotationView({ data }: QuotationViewProps) {
         {/* Conversion / Payment Section */}
         <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-[#333] pt-12 mb-32">
             
-            <div className="lg:col-span-6">
-                <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>
-                    {t.paymentTitle}
-                </h3>
-                <p className="text-[#888] max-w-lg mb-8">
-                    {t.paymentDesc}
-                </p>
-                <div className="flex items-center gap-4 text-xs font-mono text-[#666]">
-                    <div className="flex items-center gap-2">
-                        <Lock className="w-3 h-3" />
-                        <span>256-BIT ENCRYPTED</span>
+            <div className="lg:col-span-6 space-y-12">
+                {/* 1. Header & Intro */}
+                <div>
+                    <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>
+                        {t.paymentTitle}
+                    </h3>
+                    <p className="text-[#888] max-w-lg mb-8 leading-relaxed">
+                        {t.paymentDesc}
+                    </p>
+                    <div className="flex items-center gap-4 text-xs font-mono text-[#666]">
+                        <div className="flex items-center gap-2">
+                            <Lock className="w-3 h-3" />
+                            <span>256-BIT ENCRYPTED</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <ShieldCheck className="w-3 h-3" />
+                            <span>BUYER PROTECTION</span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <ShieldCheck className="w-3 h-3" />
-                        <span>BUYER PROTECTION</span>
+                </div>
+
+                {/* 2. Production Roadmap */}
+                <div>
+                    <h4 className="text-sm font-bold uppercase text-[#EDEDED] mb-6 border-b border-[#333] pb-2 inline-block">Production Roadmap</h4>
+                    <div className="relative border-l border-[#333] ml-2 pl-8 space-y-8">
+                        {[
+                            { title: "Configuration Locked", desc: "Specs are frozen and sent to engineering.", active: true },
+                            { title: "Engineering Validation", desc: "FEA Analysis & Load Rating verification.", active: false },
+                            { title: "Milling & Production", desc: "Aerospace-grade 6061-T6 forging process.", active: false },
+                            { title: "Quality Control", desc: "Hand-finished & laser inspected.", active: false },
+                            { title: "Global Shipping", desc: "Insured door-to-door delivery.", active: false },
+                        ].map((step, i) => (
+                            <div key={i} className="relative">
+                                <div className={cn(
+                                    "absolute -left-[37px] w-4 h-4 rounded-full border-2",
+                                    step.active ? "bg-[#D4F846] border-[#D4F846] shadow-[0_0_10px_rgba(212,248,70,0.5)]" : "bg-[#111] border-[#333]"
+                                )} />
+                                <h5 className={cn("text-xs font-bold uppercase mb-1", step.active ? "text-[#D4F846]" : "text-[#888]")}>{step.title}</h5>
+                                <p className="text-[10px] text-[#666] font-mono">{step.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* 3. FAQ (Compact) */}
+                <div className="border-t border-[#333] pt-8">
+                    <h4 className="text-sm font-bold uppercase text-[#EDEDED] mb-4">Frequently Asked Questions</h4>
+                    <div className="space-y-4">
+                        <div>
+                            <div className="text-xs text-[#EDEDED] font-bold mb-1">Can I change my specs after deposit?</div>
+                            <p className="text-[10px] text-[#666] leading-relaxed">Minor adjustments (finish/caps) are possible until the Engineering Sign-off. Structural changes require a re-quote.</p>
+                        </div>
+                        <div>
+                            <div className="text-xs text-[#EDEDED] font-bold mb-1">What about shipping costs?</div>
+                            <p className="text-[10px] text-[#666] leading-relaxed">Standard shipping is included. Expedited air freight can be arranged upon request before final balance payment.</p>
+                        </div>
                     </div>
                 </div>
             </div>
