@@ -7,11 +7,6 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "zneejoqfgrqzvutkituy.supabase.co",
       },
-      // Payment icons (payments-icons-library)
-      {
-        protocol: "https",
-        hostname: "cashfreelogo.cashfree.com",
-      },
     ],
   },
 };

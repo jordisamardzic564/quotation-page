@@ -16,7 +16,6 @@ import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { MagicCard } from '@/components/magicui/magic-card';
-import paymentIcons from "payments-icons-library";
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -795,53 +794,13 @@ export default function QuotationView({ data }: QuotationViewProps) {
                         
                         {/* Trust & Conversion Elements */}
                         <div className="mt-8 flex flex-col items-center gap-4">
-                            {/* Payment method icons (Cashfree payments-icons-library) */}
-                            <div className="flex items-center gap-3 opacity-60 grayscale">
-                              {[
-                                { keys: ["ideal"], label: "iDEAL" },
-                                { keys: ["bancontact"], label: "Bancontact" },
-                                { keys: ["visa", "mastercard"], label: "Visa/Mastercard" },
-                                { keys: ["paypal"], label: "PayPal" },
-                                { keys: ["banktransfer"], label: "Bank transfer" },
-                              ].map(({ keys, label }) => {
-                                // The library returns a generic "default" SVG for unknown keys.
-                                // We avoid rendering that (Next/Image disallows remote SVG by default,
-                                // and it's misleading). Instead we fall back to a small text badge.
-                                const resolved = keys
-                                  .map((key) => {
-                                    const icon = paymentIcons.getIcon(key, "sm") as
-                                      | { icon_name?: string; icon_url?: string }
-                                      | undefined;
-                                    const src = icon?.icon_url;
-                                    const isDefault =
-                                      !src ||
-                                      icon?.icon_name === "default" ||
-                                      src.includes("/default.");
-                                    return { key, src: isDefault ? undefined : src };
-                                  })
-                                  .filter((x) => Boolean(x.src));
-
-                                return (
-                                  <div key={label} className="flex items-center gap-1">
-                                    {resolved.length > 0 ? (
-                                      resolved.map(({ key, src }) => (
-                                        <Image
-                                          key={key}
-                                          src={src as string}
-                                          alt={label}
-                                          width={22}
-                                          height={22}
-                                          className="opacity-80"
-                                        />
-                                      ))
-                                    ) : (
-                                      <span className="text-[10px] font-mono border border-[#444] px-1 rounded text-[#888]">
+                            {/* Payment badges (Text-only) */}
+                            <div className="flex flex-wrap justify-center gap-2 opacity-60">
+                                {["iDEAL", "Bancontact", "Visa", "Mastercard", "PayPal", "Bank transfer"].map((label) => (
+                                    <span key={label} className="text-[10px] font-mono border border-[#444] px-1.5 py-0.5 rounded text-[#888]">
                                         {label}
-                                      </span>
-                                    )}
-                                  </div>
-                                );
-                              })}
+                                    </span>
+                                ))}
                             </div>
 
                             <a
