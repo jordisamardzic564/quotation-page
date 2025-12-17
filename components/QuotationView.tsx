@@ -21,6 +21,8 @@ import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { MagicCard } from '@/components/magicui/magic-card';
+import { AnimatedBeam } from '@/components/magicui/animated-beam';
+import { useRef } from 'react';
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -334,6 +336,12 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
   // We keep the UI strictly English for now (no automatic locale-based switching).
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  
+  // Timeline refs for AnimatedBeam
+  const containerRef = useRef<HTMLDivElement>(null);
+  const div1Ref = useRef<HTMLDivElement>(null);
+  const div2Ref = useRef<HTMLDivElement>(null);
+  const div3Ref = useRef<HTMLDivElement>(null);
 
   const t = {
     paymentTitle: isFullPayment ? 'Complete Your Order' : 'Production Slot',
@@ -731,20 +739,64 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 {/* Timeline: What happens next? */}
                 <div className="mb-12">
                     <h4 className="text-xs font-mono uppercase text-[#666] mb-6 tracking-widest">What happens next?</h4>
-                    <div className="relative border-l border-[#333] ml-2 space-y-8 pb-2">
-                        {[
-                            { icon: FileCheck, title: "Order Confirmation", desc: "You receive an instant confirmation and invoice." },
-                            { icon: Hammer, title: "Engineering & Milling", desc: "Your configuration enters our precision milling queue." },
-                            { icon: Truck, title: "Quality Control & Shipping", desc: "After strict QC, we ship via insured express freight." }
-                        ].map((step, idx) => (
-                            <div key={idx} className="relative pl-8 group">
-                                <div className="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-[#111] border border-[#444] group-hover:border-[#D4F846] group-hover:bg-[#D4F846] transition-colors" />
+                    
+                    <div className="relative ml-2" ref={containerRef}>
+                        {/* Animated Beams (Connecting lines) */}
+                        <div className="absolute left-[4px] top-[4px] bottom-[4px] w-[2px]">
+                             <AnimatedBeam 
+                                containerRef={containerRef} 
+                                fromRef={div1Ref} 
+                                toRef={div2Ref} 
+                                curvature={0} 
+                                pathColor="#333"
+                                gradientStartColor="#D4F846" 
+                                gradientStopColor="#D4F846"
+                                duration={2}
+                            />
+                            <AnimatedBeam 
+                                containerRef={containerRef} 
+                                fromRef={div2Ref} 
+                                toRef={div3Ref} 
+                                curvature={0} 
+                                pathColor="#333"
+                                gradientStartColor="#D4F846" 
+                                gradientStopColor="#D4F846"
+                                duration={2}
+                                delay={1}
+                            />
+                        </div>
+
+                        <div className="space-y-8 relative z-10">
+                            {/* Step 1 */}
+                            <div className="relative pl-8 group">
+                                <div ref={div1Ref} className="absolute left-0 top-1 w-2.5 h-2.5 rounded-full bg-[#111] border border-[#444] group-hover:border-[#D4F846] group-hover:bg-[#D4F846] transition-colors z-20" />
                                 <h5 className="text-[#EDEDED] font-bold text-sm uppercase mb-1 flex items-center gap-2">
-                                    {step.title}
+                                    <FileCheck className="w-4 h-4 text-[#D4F846]" />
+                                    Order Confirmation
                                 </h5>
-                                <p className="text-[#666] text-xs leading-relaxed max-w-xs">{step.desc}</p>
+                                <p className="text-[#666] text-xs leading-relaxed max-w-xs">You receive an instant confirmation and invoice.</p>
                             </div>
-                        ))}
+
+                            {/* Step 2 */}
+                            <div className="relative pl-8 group">
+                                <div ref={div2Ref} className="absolute left-0 top-1 w-2.5 h-2.5 rounded-full bg-[#111] border border-[#444] group-hover:border-[#D4F846] group-hover:bg-[#D4F846] transition-colors z-20" />
+                                <h5 className="text-[#EDEDED] font-bold text-sm uppercase mb-1 flex items-center gap-2">
+                                    <Hammer className="w-4 h-4 text-[#D4F846]" />
+                                    Engineering & Milling
+                                </h5>
+                                <p className="text-[#666] text-xs leading-relaxed max-w-xs">Your configuration enters our precision milling queue.</p>
+                            </div>
+
+                            {/* Step 3 */}
+                            <div className="relative pl-8 group">
+                                <div ref={div3Ref} className="absolute left-0 top-1 w-2.5 h-2.5 rounded-full bg-[#111] border border-[#444] group-hover:border-[#D4F846] group-hover:bg-[#D4F846] transition-colors z-20" />
+                                <h5 className="text-[#EDEDED] font-bold text-sm uppercase mb-1 flex items-center gap-2">
+                                    <Truck className="w-4 h-4 text-[#D4F846]" />
+                                    Quality Control & Shipping
+                                </h5>
+                                <p className="text-[#666] text-xs leading-relaxed max-w-xs">After strict QC, we ship via insured express freight.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
