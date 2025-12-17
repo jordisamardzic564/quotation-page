@@ -9,20 +9,13 @@ import {
   Disc, 
   Lock,
   ArrowRight,
-  Loader2,
-  ChevronDown,
-  Clock,
-  Truck,
-  FileCheck,
-  Hammer
+  Loader2
 } from 'lucide-react';
 import { Quotation, Product } from '@/types/quotation';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { MagicCard } from '@/components/magicui/magic-card';
-import { AnimatedBeam } from '@/components/magicui/animated-beam';
-import { useRef } from 'react';
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -331,43 +324,47 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
   const mainProduct = wheelProducts[0] || enrichedProducts[0]; // Fallback naar eerste product als er geen wielen zijn
   
+  // === LANGUAGE DETECTION ===
+  const [language, setLanguage] = useState<'en' | 'nl'>('en');
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.language.startsWith('nl')) {
+      setLanguage('nl');
+    }
+  }, []);
+
   const isFullPayment = data.payment_mode === 'full';
   const [isLoading, setIsLoading] = useState(false);
 
-  // We keep the UI strictly English for now (no automatic locale-based switching).
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  
-  // Timeline refs for AnimatedBeam
-  const containerRef = useRef<HTMLDivElement>(null);
-  const div1Ref = useRef<HTMLDivElement>(null);
-  const div2Ref = useRef<HTMLDivElement>(null);
-  const div3Ref = useRef<HTMLDivElement>(null);
-
   const t = {
-    paymentTitle: isFullPayment ? 'Complete Your Order' : 'Production Slot',
-
-    paymentDesc: isFullPayment
-      ? `Your configuration is approved. Please complete the full payment of ${formatCurrency(
-          data.aanbetaling,
-          data.valuta
-        )} to proceed directly to production.`
-      : `Your configuration is ready. Due to high demand for the ${
-          mainProduct.size || 'forged'
-        } raw forgings, we require a deposit of ${formatCurrency(
-          data.aanbetaling,
-          data.valuta
-        )} to secure your allocation in the milling queue.`,
-
-    totalExcl: "Total Excl. VAT",
-    totalIncl: "Total Incl. VAT",
-    totalDue: isFullPayment ? "Total Due (Incl. VAT)" : "30% Deposit (Incl. VAT)",
-
-    balanceDue: "Balance due before shipping",
-
-    buttonText: isFullPayment ? "Complete Payment" : "Secure Allocation",
-
-    verifiedBy: "Verified by",
-    terms: "By proceeding you accept our engineering terms & conditions.",
+    paymentTitle: language === 'nl' 
+      ? (isFullPayment ? 'Rond uw bestelling af' : 'Productie Slot Reserveren')
+      : (isFullPayment ? 'Complete Your Order' : 'Production Slot'),
+    
+    paymentDesc: language === 'nl'
+      ? (isFullPayment 
+          ? `Uw configuratie is goedgekeurd. Voldoe de volledige betaling van ${formatCurrency(data.aanbetaling, data.valuta)} om de productie te starten.`
+          : `Uw configuratie staat klaar. Vanwege de grote vraag naar ${mainProduct.size || 'forged'} ruwe forgings vragen wij een aanbetaling van ${formatCurrency(data.aanbetaling, data.valuta)} om uw plek in de freesrij te reserveren.`)
+      : (isFullPayment 
+          ? `Your configuration is approved. Please complete the full payment of ${formatCurrency(data.aanbetaling, data.valuta)} to proceed directly to production.`
+          : `Your configuration is ready. Due to high demand for the ${mainProduct.size || 'forged'} raw forgings, we require a deposit of ${formatCurrency(data.aanbetaling, data.valuta)} to secure your allocation in the milling queue.`),
+    
+    totalExcl: language === 'nl' ? "Totaal Excl. BTW" : "Total Excl. VAT",
+    totalIncl: language === 'nl' ? "Totaal Incl. BTW" : "Total Incl. VAT",
+    totalDue: language === 'nl' 
+      ? (isFullPayment ? "Totaal te voldoen (Incl. BTW)" : "30% Aanbetaling (Incl. BTW)")
+      : (isFullPayment ? "Total Due (Incl. VAT)" : "30% Deposit (Incl. VAT)"),
+    
+    balanceDue: language === 'nl' ? "Restbedrag te voldoen voor levering" : "Balance due before shipping",
+    
+    buttonText: language === 'nl'
+      ? (isFullPayment ? "Betaling Voldoen" : "Productieplaats Veiligstellen")
+      : (isFullPayment ? "Complete Payment" : "Secure Allocation"),
+      
+    verifiedBy: language === 'nl' ? "Geverifieerd door" : "Verified by",
+    terms: language === 'nl' 
+      ? "Door verder te gaan accepteert u onze technische voorwaarden."
+      : "By proceeding you accept our engineering terms & conditions."
   };
 
   const handlePayment = async () => {
@@ -383,7 +380,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
         body: JSON.stringify({
           offerte_id: data.offerte_id,
           uuid: data.uuid,
-          locale: 'en_US'
+          locale: language === 'nl' ? 'nl_NL' : 'en_US'
         }),
       });
 
@@ -392,11 +389,11 @@ export default function QuotationView({ data }: QuotationViewProps) {
       if (result.url) {
         window.location.href = result.url;
       } else {
-        alert('Could not generate payment link.');
+        alert('Kon geen betaallink genereren.');
       }
     } catch (error) {
       console.error(error);
-      alert('Something went wrong.');
+      alert('Er ging iets mis.');
     } finally {
       setIsLoading(false);
     }
@@ -428,7 +425,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-[100] bg-[#111] flex items-center justify-center px-4"
           >
-            <div className="max-w-4xl text-center flex flex-col items-center px-4 w-full">
+            <div className="max-w-4xl text-center flex flex-col items-center">
                 <div className="mb-8">
                     <div className="w-2 h-2 bg-[#D4F846] mx-auto rounded-full animate-pulse" />
                 </div>
@@ -437,7 +434,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                   animation="blurIn" 
                   by="character" 
                   duration={2} 
-                  className="text-lg md:text-3xl text-[#EDEDED] font-light uppercase tracking-wide leading-tight mb-2 block max-w-full break-words"
+                  className="text-xl md:text-3xl text-[#EDEDED] font-light uppercase tracking-wide leading-tight mb-2 block"
                   style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
                 >
                   {introLine1}
@@ -448,7 +445,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                   by="character" 
                   duration={1}
                   delay={2}
-                  className="text-2xl md:text-5xl text-[#EDEDED] font-bold uppercase tracking-wide leading-tight block text-[#D4F846] max-w-full break-words"
+                  className="text-2xl md:text-5xl text-[#EDEDED] font-bold uppercase tracking-wide leading-tight block text-[#D4F846]"
                   style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
                 >
                   {introLine2}
@@ -501,7 +498,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                role="button"
                aria-disabled={isExpired}
                className={cn(
-                 "text-[10px] md:text-xs font-bold uppercase tracking-widest py-2 px-4 md:py-3 md:px-6 skew-x-[-10deg] inline-block transition-colors",
+                 "text-xs font-bold uppercase tracking-widest py-3 px-6 skew-x-[-10deg] inline-block transition-colors",
                  isExpired 
                   ? "bg-[#333] text-[#666] cursor-not-allowed" 
                   : "bg-[#D4F846] text-black hover:bg-white"
@@ -732,110 +729,9 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>
                     {t.paymentTitle}
                 </h3>
-                <p className="text-[#888] max-w-lg mb-8 leading-relaxed">
+                <p className="text-[#888] max-w-lg mb-8">
                     {t.paymentDesc}
                 </p>
-
-                {/* Timeline: What happens next? */}
-                <div className="mb-12">
-                    <h4 className="text-xs font-mono uppercase text-[#666] mb-6 tracking-widest">What happens next?</h4>
-                    
-                    <div className="relative ml-2" ref={containerRef}>
-                        {/* Animated Beams (Connecting lines) */}
-                        <div className="absolute left-[4px] top-[4px] bottom-[4px] w-[2px]">
-                             <AnimatedBeam 
-                                containerRef={containerRef} 
-                                fromRef={div1Ref} 
-                                toRef={div2Ref} 
-                                curvature={0} 
-                                pathColor="#333"
-                                gradientStartColor="#D4F846" 
-                                gradientStopColor="#D4F846"
-                                duration={2}
-                            />
-                            <AnimatedBeam 
-                                containerRef={containerRef} 
-                                fromRef={div2Ref} 
-                                toRef={div3Ref} 
-                                curvature={0} 
-                                pathColor="#333"
-                                gradientStartColor="#D4F846" 
-                                gradientStopColor="#D4F846"
-                                duration={2}
-                                delay={1}
-                            />
-                        </div>
-
-                        <div className="space-y-8 relative z-10">
-                            {/* Step 1 */}
-                            <div className="relative pl-8 group">
-                                <div ref={div1Ref} className="absolute left-0 top-1 w-2.5 h-2.5 rounded-full bg-[#111] border border-[#444] group-hover:border-[#D4F846] group-hover:bg-[#D4F846] transition-colors z-20" />
-                                <h5 className="text-[#EDEDED] font-bold text-sm uppercase mb-1 flex items-center gap-2">
-                                    <FileCheck className="w-4 h-4 text-[#D4F846]" />
-                                    Order Confirmation
-                                </h5>
-                                <p className="text-[#666] text-xs leading-relaxed max-w-xs">You receive an instant confirmation and invoice.</p>
-                            </div>
-
-                            {/* Step 2 */}
-                            <div className="relative pl-8 group">
-                                <div ref={div2Ref} className="absolute left-0 top-1 w-2.5 h-2.5 rounded-full bg-[#111] border border-[#444] group-hover:border-[#D4F846] group-hover:bg-[#D4F846] transition-colors z-20" />
-                                <h5 className="text-[#EDEDED] font-bold text-sm uppercase mb-1 flex items-center gap-2">
-                                    <Hammer className="w-4 h-4 text-[#D4F846]" />
-                                    Engineering & Milling
-                                </h5>
-                                <p className="text-[#666] text-xs leading-relaxed max-w-xs">Your configuration enters our precision milling queue.</p>
-                            </div>
-
-                            {/* Step 3 */}
-                            <div className="relative pl-8 group">
-                                <div ref={div3Ref} className="absolute left-0 top-1 w-2.5 h-2.5 rounded-full bg-[#111] border border-[#444] group-hover:border-[#D4F846] group-hover:bg-[#D4F846] transition-colors z-20" />
-                                <h5 className="text-[#EDEDED] font-bold text-sm uppercase mb-1 flex items-center gap-2">
-                                    <Truck className="w-4 h-4 text-[#D4F846]" />
-                                    Quality Control & Shipping
-                                </h5>
-                                <p className="text-[#666] text-xs leading-relaxed max-w-xs">After strict QC, we ship via insured express freight.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* FAQ Accordion */}
-                <div className="mb-8">
-                     <h4 className="text-xs font-mono uppercase text-[#666] mb-4 tracking-widest">Frequently Asked Questions</h4>
-                     <div className="space-y-2">
-                        {[
-                            { q: "What is the estimated delivery time?", a: "Standard production takes 4-5 weeks. Shipping within EU takes 3-5 business days." },
-                            { q: "Is my deposit refundable?", a: "Yes, the deposit is fully refundable until you sign off on the final 3D engineering files." },
-                            { q: "Do you ship worldwide?", a: "Yes, we ship globally with fully insured specialized freight partners." }
-                        ].map((faq, idx) => (
-                            <div key={idx} className="border border-[#222] bg-[#111] rounded overflow-hidden">
-                                <button 
-                                    onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
-                                    className="w-full flex items-center justify-between p-4 text-left hover:bg-[#1a1a1a] transition-colors"
-                                >
-                                    <span className="text-xs font-bold text-[#EDEDED] uppercase">{faq.q}</span>
-                                    <ChevronDown className={cn("w-4 h-4 text-[#666] transition-transform", activeFaq === idx ? "rotate-180" : "")} />
-                                </button>
-                                <AnimatePresence>
-                                    {activeFaq === idx && (
-                                        <motion.div 
-                                            initial={{ height: 0 }}
-                                            animate={{ height: "auto" }}
-                                            exit={{ height: 0 }}
-                                            className="overflow-hidden"
-                                        >
-                                            <div className="p-4 pt-0 text-xs text-[#888] leading-relaxed border-t border-[#222]">
-                                                {faq.a}
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        ))}
-                     </div>
-                </div>
-
                 <div className="flex items-center gap-4 text-xs font-mono text-[#666]">
                     <div className="flex items-center gap-2">
                         <Lock className="w-3 h-3" />
@@ -849,7 +745,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
             </div>
 
             <MagicCard 
-                className="lg:col-span-6 bg-[#333] relative"
+                className="lg:col-span-6 bg-[#333] relative overflow-hidden"
                 gradientColor="transparent"
                 gradientFrom="#D4F846"
                 gradientTo="#D4F846"
@@ -877,9 +773,9 @@ export default function QuotationView({ data }: QuotationViewProps) {
                           </div>
                         )}
                         
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+                        <div className="flex justify-between items-end mb-12">
                             <div className="flex flex-col">
-                                <span className="text-[#D4F846] font-mono uppercase text-sm font-bold max-w-[200px] md:max-w-none leading-snug">
+                                <span className="text-[#D4F846] font-mono uppercase text-sm font-bold">
                                     {t.totalDue}
                                 </span>
                                 {!isFullPayment && (
@@ -888,7 +784,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                                     </span>
                                 )}
                             </div>
-                            <span className="text-4xl md:text-6xl font-extended text-[#D4F846] tracking-tighter">
+                            <span className="text-5xl md:text-6xl font-extended text-[#D4F846] tracking-tighter">
                                 {formatCurrency(data.aanbetaling, data.valuta)}
                             </span>
                         </div>
@@ -910,41 +806,19 @@ export default function QuotationView({ data }: QuotationViewProps) {
                         
                         {/* Trust & Conversion Elements */}
                         <div className="mt-8 flex flex-col items-center gap-4">
-                            {/* Payment badges (Text-only) */}
-                            <div className="flex flex-wrap justify-center gap-2 opacity-60">
-                                {["iDEAL", "Bancontact", "Visa", "Mastercard", "PayPal", "Bank transfer"].map((label) => (
-                                    <span key={label} className="text-[10px] font-mono border border-[#444] px-1.5 py-0.5 rounded text-[#888]">
-                                        {label}
-                                    </span>
-                                ))}
+                            <div className="flex gap-3 opacity-30 grayscale">
+                                <span className="text-[10px] font-mono border border-[#444] px-1 rounded">VISA</span>
+                                <span className="text-[10px] font-mono border border-[#444] px-1 rounded">MC</span>
+                                <span className="text-[10px] font-mono border border-[#444] px-1 rounded">AMEX</span>
                             </div>
-
-                            <a
-                              href="#"
-                              onClick={(e) => e.preventDefault()}
-                              className="text-[10px] font-mono text-[#666] underline underline-offset-4 hover:text-[#D4F846] transition-colors"
-                            >
-                              and 10+ other secure payment methods
-                            </a>
                             
                             <div className="flex items-center gap-2 text-[10px] text-[#666]">
                                 <div className="w-1.5 h-1.5 bg-[#D4F846] rounded-full" />
                                 <span>Fully refundable until Design Sign-off</span>
                             </div>
 
-                            <div className="mt-4 pt-4 border-t border-[#333] w-full flex flex-col items-center">
-                                <div className="text-[10px] text-[#444] font-mono uppercase tracking-widest mb-3">{t.verifiedBy}</div>
-                                
-                                {/* Vincent Avatar */}
-                                <div className="relative w-12 h-12 mb-3">
-                                    <Image 
-                                        src="/vincent-pedroli.jpg" 
-                                        alt="Vincent Pedroli"
-                                        fill
-                                        className="rounded-full object-cover border-2 border-[#D4F846]"
-                                    />
-                                </div>
-
+                            <div className="mt-4 pt-4 border-t border-[#333] w-full text-center">
+                                <div className="text-[10px] text-[#444] font-mono uppercase tracking-widest mb-1">{t.verifiedBy}</div>
                                 <div className="text-xs text-[#888] font-bold uppercase" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>Vincent Pedroli</div>
                                 <div className="text-[9px] text-[#D4F846] font-mono">Fitment Specialist</div>
                             </div>
