@@ -16,6 +16,7 @@ import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { MagicCard } from '@/components/magicui/magic-card';
+import paymentIcons from "payments-icons-library";
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -324,47 +325,35 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
   const mainProduct = wheelProducts[0] || enrichedProducts[0]; // Fallback naar eerste product als er geen wielen zijn
   
-  // === LANGUAGE DETECTION ===
-  const [language, setLanguage] = useState<'en' | 'nl'>('en');
-
-  useEffect(() => {
-    if (typeof navigator !== 'undefined' && navigator.language.startsWith('nl')) {
-      setLanguage('nl');
-    }
-  }, []);
-
   const isFullPayment = data.payment_mode === 'full';
   const [isLoading, setIsLoading] = useState(false);
 
+  // We keep the UI strictly English for now (no automatic locale-based switching).
   const t = {
-    paymentTitle: language === 'nl' 
-      ? (isFullPayment ? 'Rond uw bestelling af' : 'Productie Slot Reserveren')
-      : (isFullPayment ? 'Complete Your Order' : 'Production Slot'),
-    
-    paymentDesc: language === 'nl'
-      ? (isFullPayment 
-          ? `Uw configuratie is goedgekeurd. Voldoe de volledige betaling van ${formatCurrency(data.aanbetaling, data.valuta)} om de productie te starten.`
-          : `Uw configuratie staat klaar. Vanwege de grote vraag naar ${mainProduct.size || 'forged'} ruwe forgings vragen wij een aanbetaling van ${formatCurrency(data.aanbetaling, data.valuta)} om uw plek in de freesrij te reserveren.`)
-      : (isFullPayment 
-          ? `Your configuration is approved. Please complete the full payment of ${formatCurrency(data.aanbetaling, data.valuta)} to proceed directly to production.`
-          : `Your configuration is ready. Due to high demand for the ${mainProduct.size || 'forged'} raw forgings, we require a deposit of ${formatCurrency(data.aanbetaling, data.valuta)} to secure your allocation in the milling queue.`),
-    
-    totalExcl: language === 'nl' ? "Totaal Excl. BTW" : "Total Excl. VAT",
-    totalIncl: language === 'nl' ? "Totaal Incl. BTW" : "Total Incl. VAT",
-    totalDue: language === 'nl' 
-      ? (isFullPayment ? "Totaal te voldoen (Incl. BTW)" : "30% Aanbetaling (Incl. BTW)")
-      : (isFullPayment ? "Total Due (Incl. VAT)" : "30% Deposit (Incl. VAT)"),
-    
-    balanceDue: language === 'nl' ? "Restbedrag te voldoen voor levering" : "Balance due before shipping",
-    
-    buttonText: language === 'nl'
-      ? (isFullPayment ? "Betaling Voldoen" : "Productieplaats Veiligstellen")
-      : (isFullPayment ? "Complete Payment" : "Secure Allocation"),
-      
-    verifiedBy: language === 'nl' ? "Geverifieerd door" : "Verified by",
-    terms: language === 'nl' 
-      ? "Door verder te gaan accepteert u onze technische voorwaarden."
-      : "By proceeding you accept our engineering terms & conditions."
+    paymentTitle: isFullPayment ? 'Complete Your Order' : 'Production Slot',
+
+    paymentDesc: isFullPayment
+      ? `Your configuration is approved. Please complete the full payment of ${formatCurrency(
+          data.aanbetaling,
+          data.valuta
+        )} to proceed directly to production.`
+      : `Your configuration is ready. Due to high demand for the ${
+          mainProduct.size || 'forged'
+        } raw forgings, we require a deposit of ${formatCurrency(
+          data.aanbetaling,
+          data.valuta
+        )} to secure your allocation in the milling queue.`,
+
+    totalExcl: "Total Excl. VAT",
+    totalIncl: "Total Incl. VAT",
+    totalDue: isFullPayment ? "Total Due (Incl. VAT)" : "30% Deposit (Incl. VAT)",
+
+    balanceDue: "Balance due before shipping",
+
+    buttonText: isFullPayment ? "Complete Payment" : "Secure Allocation",
+
+    verifiedBy: "Verified by",
+    terms: "By proceeding you accept our engineering terms & conditions.",
   };
 
   const handlePayment = async () => {
@@ -380,7 +369,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
         body: JSON.stringify({
           offerte_id: data.offerte_id,
           uuid: data.uuid,
-          locale: language === 'nl' ? 'nl_NL' : 'en_US'
+          locale: 'en_US'
         }),
       });
 
@@ -389,11 +378,11 @@ export default function QuotationView({ data }: QuotationViewProps) {
       if (result.url) {
         window.location.href = result.url;
       } else {
-        alert('Kon geen betaallink genereren.');
+        alert('Could not generate payment link.');
       }
     } catch (error) {
       console.error(error);
-      alert('Er ging iets mis.');
+      alert('Something went wrong.');
     } finally {
       setIsLoading(false);
     }
@@ -745,7 +734,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
             </div>
 
             <MagicCard 
-                className="lg:col-span-6 bg-[#333] relative overflow-hidden"
+                className="lg:col-span-6 bg-[#333] relative"
                 gradientColor="transparent"
                 gradientFrom="#D4F846"
                 gradientTo="#D4F846"
@@ -806,11 +795,62 @@ export default function QuotationView({ data }: QuotationViewProps) {
                         
                         {/* Trust & Conversion Elements */}
                         <div className="mt-8 flex flex-col items-center gap-4">
-                            <div className="flex gap-3 opacity-30 grayscale">
-                                <span className="text-[10px] font-mono border border-[#444] px-1 rounded">VISA</span>
-                                <span className="text-[10px] font-mono border border-[#444] px-1 rounded">MC</span>
-                                <span className="text-[10px] font-mono border border-[#444] px-1 rounded">AMEX</span>
+                            {/* Payment method icons (Cashfree payments-icons-library) */}
+                            <div className="flex items-center gap-3 opacity-60 grayscale">
+                              {[
+                                { keys: ["ideal"], label: "iDEAL" },
+                                { keys: ["bancontact"], label: "Bancontact" },
+                                { keys: ["visa", "mastercard"], label: "Visa/Mastercard" },
+                                { keys: ["paypal"], label: "PayPal" },
+                                { keys: ["banktransfer"], label: "Bank transfer" },
+                              ].map(({ keys, label }) => {
+                                // The library returns a generic "default" SVG for unknown keys.
+                                // We avoid rendering that (Next/Image disallows remote SVG by default,
+                                // and it's misleading). Instead we fall back to a small text badge.
+                                const resolved = keys
+                                  .map((key) => {
+                                    const icon = paymentIcons.getIcon(key, "sm") as
+                                      | { icon_name?: string; icon_url?: string }
+                                      | undefined;
+                                    const src = icon?.icon_url;
+                                    const isDefault =
+                                      !src ||
+                                      icon?.icon_name === "default" ||
+                                      src.includes("/default.");
+                                    return { key, src: isDefault ? undefined : src };
+                                  })
+                                  .filter((x) => Boolean(x.src));
+
+                                return (
+                                  <div key={label} className="flex items-center gap-1">
+                                    {resolved.length > 0 ? (
+                                      resolved.map(({ key, src }) => (
+                                        <Image
+                                          key={key}
+                                          src={src as string}
+                                          alt={label}
+                                          width={22}
+                                          height={22}
+                                          className="opacity-80"
+                                        />
+                                      ))
+                                    ) : (
+                                      <span className="text-[10px] font-mono border border-[#444] px-1 rounded text-[#888]">
+                                        {label}
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
+
+                            <a
+                              href="#"
+                              onClick={(e) => e.preventDefault()}
+                              className="text-[10px] font-mono text-[#666] underline underline-offset-4 hover:text-[#D4F846] transition-colors"
+                            >
+                              and 10+ other secure payment methods
+                            </a>
                             
                             <div className="flex items-center gap-2 text-[10px] text-[#666]">
                                 <div className="w-1.5 h-1.5 bg-[#D4F846] rounded-full" />

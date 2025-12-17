@@ -129,8 +129,8 @@ export default async function OffertePage({
     return (
       <main className="min-h-screen flex items-center justify-center text-white">
         <div className="text-center space-y-3">
-          <h1 className="text-2xl font-bold">Offerte niet gevonden</h1>
-          <p className="text-sm text-gray-400">Controleer de link of neem contact op.</p>
+          <h1 className="text-2xl font-bold">Quotation not found</h1>
+          <p className="text-sm text-gray-400">Please check the link or contact us for assistance.</p>
         </div>
       </main>
     );

@@ -18,7 +18,7 @@ interface SuccessViewProps {
 }
 
 const formatCurrency = (amount: number, currency: string) => {
-  return new Intl.NumberFormat('nl-NL', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 0,
@@ -42,7 +42,7 @@ export default function SuccessView({ data }: SuccessViewProps) {
   React.useEffect(() => {
     console.log("SuccessView Data:", data);
     if (!data.name) {
-      console.warn("Waarschuwing: 'name' veld is leeg in quotation data!", data);
+      console.warn("Warning: 'name' field is empty in quotation data!", data);
     }
   }, [data]);
 
@@ -128,7 +128,7 @@ export default function SuccessView({ data }: SuccessViewProps) {
                 className="order-1 lg:order-2 w-full"
             >
                 <MagicCard 
-                    className="bg-[#111] border border-[#222] overflow-hidden"
+                    className="bg-[#111] border border-[#222]"
                     gradientColor="#222"
                     gradientOpacity={0.5}
                 >
@@ -141,7 +141,7 @@ export default function SuccessView({ data }: SuccessViewProps) {
                             </div>
                             <div className="text-right">
                                 <div className="text-[10px] text-[#666] uppercase font-mono tracking-widest mb-1">Date</div>
-                                <div className="text-sm font-mono text-[#EDEDED]">{new Date().toLocaleDateString('nl-NL')}</div>
+                                <div className="text-sm font-mono text-[#EDEDED]">{new Date().toLocaleDateString('en-US')}</div>
                             </div>
                         </div>
 

@@ -71,11 +71,28 @@ export function MagicCard({
 
   return (
     <div
-      className={cn("group relative rounded-[inherit]", className)}
+      // Keep overflow visible so the hover glow can render around the card edges.
+      className={cn("group relative rounded-[inherit] overflow-visible", className)}
       onPointerMove={handlePointerMove}
       onPointerLeave={reset}
       onPointerEnter={reset}
     >
+      {/* Outer glow (blurred). This is what gives a visible halo on all sides (incl. top). */}
+      <motion.div
+        className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: useMotionTemplate`
+          radial-gradient(${gradientSize}px circle at ${mouseX}px ${mouseY}px,
+          ${gradientFrom},
+          ${gradientTo},
+          transparent 70%
+          )
+          `,
+          filter: "blur(18px)",
+          opacity: Math.min(1, gradientOpacity * 0.6),
+        }}
+      />
+
       <motion.div
         className="bg-border pointer-events-none absolute inset-0 rounded-[inherit] duration-300 group-hover:opacity-100"
         style={{
