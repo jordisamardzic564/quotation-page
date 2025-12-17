@@ -849,4 +849,4 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
     </div>
   );
-}
+} 
