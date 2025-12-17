@@ -39,8 +39,14 @@ async function getQuotation(uuid: string | undefined): Promise<Quotation | null>
     return null;
   }
 
-  // We zoeken nu op UUID in plaats van offerte_id
-  const url = `${base.replace(/\/$/, "")}/webhook/offerte?uuid=${encodeURIComponent(uuid)}`;
+  // n8n workflow leest momenteel `query.offerte_id` (niet `query.uuid`).
+  // We sturen daarom de UUID mee als `offerte_id`, zodat n8n in Odoo kan zoeken op:
+  // - sale.order.name (S00xxx) of
+  // - x_studio_quotation_uuid (uuid)
+  // Extra: we sturen ook `uuid` mee voor forward-compatibiliteit als de workflow later wél daarop gaat luisteren.
+  const url = `${base.replace(/\/$/, "")}/webhook/offerte?offerte_id=${encodeURIComponent(
+    uuid
+  )}&uuid=${encodeURIComponent(uuid)}`;
 
   try {
     console.log("Fetching offerte", { uuid, url });
