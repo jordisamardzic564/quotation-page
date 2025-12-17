@@ -413,7 +413,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="fixed inset-0 z-[100] bg-[#111] flex items-center justify-center px-4"
           >
-            <div className="max-w-4xl text-center flex flex-col items-center">
+            <div className="max-w-4xl text-center flex flex-col items-center px-4 w-full">
                 <div className="mb-8">
                     <div className="w-2 h-2 bg-[#D4F846] mx-auto rounded-full animate-pulse" />
                 </div>
@@ -422,7 +422,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                   animation="blurIn" 
                   by="character" 
                   duration={2} 
-                  className="text-xl md:text-3xl text-[#EDEDED] font-light uppercase tracking-wide leading-tight mb-2 block"
+                  className="text-lg md:text-3xl text-[#EDEDED] font-light uppercase tracking-wide leading-tight mb-2 block max-w-full break-words"
                   style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
                 >
                   {introLine1}
@@ -433,7 +433,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                   by="character" 
                   duration={1}
                   delay={2}
-                  className="text-2xl md:text-5xl text-[#EDEDED] font-bold uppercase tracking-wide leading-tight block text-[#D4F846]"
+                  className="text-2xl md:text-5xl text-[#EDEDED] font-bold uppercase tracking-wide leading-tight block text-[#D4F846] max-w-full break-words"
                   style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
                 >
                   {introLine2}
@@ -486,7 +486,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                role="button"
                aria-disabled={isExpired}
                className={cn(
-                 "text-xs font-bold uppercase tracking-widest py-3 px-6 skew-x-[-10deg] inline-block transition-colors",
+                 "text-[10px] md:text-xs font-bold uppercase tracking-widest py-2 px-4 md:py-3 md:px-6 skew-x-[-10deg] inline-block transition-colors",
                  isExpired 
                   ? "bg-[#333] text-[#666] cursor-not-allowed" 
                   : "bg-[#D4F846] text-black hover:bg-white"
@@ -761,9 +761,9 @@ export default function QuotationView({ data }: QuotationViewProps) {
                           </div>
                         )}
                         
-                        <div className="flex justify-between items-end mb-12">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
                             <div className="flex flex-col">
-                                <span className="text-[#D4F846] font-mono uppercase text-sm font-bold">
+                                <span className="text-[#D4F846] font-mono uppercase text-sm font-bold max-w-[200px] md:max-w-none leading-snug">
                                     {t.totalDue}
                                 </span>
                                 {!isFullPayment && (
@@ -772,7 +772,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                                     </span>
                                 )}
                             </div>
-                            <span className="text-5xl md:text-6xl font-extended text-[#D4F846] tracking-tighter">
+                            <span className="text-4xl md:text-6xl font-extended text-[#D4F846] tracking-tighter">
                                 {formatCurrency(data.aanbetaling, data.valuta)}
                             </span>
                         </div>
@@ -816,8 +816,19 @@ export default function QuotationView({ data }: QuotationViewProps) {
                                 <span>Fully refundable until Design Sign-off</span>
                             </div>
 
-                            <div className="mt-4 pt-4 border-t border-[#333] w-full text-center">
-                                <div className="text-[10px] text-[#444] font-mono uppercase tracking-widest mb-1">{t.verifiedBy}</div>
+                            <div className="mt-4 pt-4 border-t border-[#333] w-full flex flex-col items-center">
+                                <div className="text-[10px] text-[#444] font-mono uppercase tracking-widest mb-3">{t.verifiedBy}</div>
+                                
+                                {/* Vincent Avatar */}
+                                <div className="relative w-12 h-12 mb-3">
+                                    <Image 
+                                        src="/vincent-pedroli.jpg" 
+                                        alt="Vincent Pedroli"
+                                        fill
+                                        className="rounded-full object-cover border-2 border-[#D4F846]"
+                                    />
+                                </div>
+
                                 <div className="text-xs text-[#888] font-bold uppercase" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>Vincent Pedroli</div>
                                 <div className="text-[9px] text-[#D4F846] font-mono">Fitment Specialist</div>
                             </div>
