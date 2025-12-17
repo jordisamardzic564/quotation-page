@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -60,11 +62,14 @@ body::after {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #161616;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #ccc;
   border-radius: 0px; 
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #333;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #D4F846;
@@ -74,9 +79,8 @@ body::after {
   mix-blend-mode: multiply;
 }
 
-/* Specific heading override as requested */
+/* Specific heading override as requested - removed explicit color to allow dark mode overrides */
 h1, h2, h3, .heading-extended {
-  color: #fff;
   margin-top: 0;
   margin-bottom: 0;
   font-family: 'Ppmonumentextended', sans-serif;

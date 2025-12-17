@@ -715,44 +715,50 @@ export default function QuotationView({ data }: QuotationViewProps) {
         <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-gray-200 dark:border-[#333] pt-12 mb-32">
             
             <div className="lg:col-span-6 space-y-12">
-                {/* 1. Header & Intro */}
+                {/* 1. Header & Roadmap */}
                 <div>
-                    <h3 className="uppercase mb-6 text-black dark:text-white" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', marginTop: 0, marginBottom: 0 }}>
-                        {t.paymentTitle}
+                    {/* Main Header replaces "Production Slot" */}
+                    <h3 className="uppercase mb-8 text-black dark:text-white" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', marginTop: 0, marginBottom: 0 }}>
+                        Production Roadmap
                     </h3>
-                    <p className="text-gray-600 dark:text-[#888] max-w-lg mb-8 leading-relaxed">
-                        {t.paymentDesc}
-                    </p>
-                    <div className="flex items-center gap-4 text-xs font-mono text-gray-500 dark:text-[#666]">
-                        <div className="flex items-center gap-2">
-                            <Lock className="w-3 h-3" />
-                            <span>256-BIT ENCRYPTED</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <ShieldCheck className="w-3 h-3" />
-                            <span>BUYER PROTECTION</span>
-                        </div>
-                    </div>
-                </div>
 
-                {/* 2. Production Roadmap */}
-                <div>
-                    <h4 className="text-sm font-bold uppercase text-black dark:text-[#EDEDED] mb-6 border-b border-gray-200 dark:border-[#333] pb-2 inline-block">Production Roadmap</h4>
                     <div className="relative border-l border-gray-200 dark:border-[#333] ml-2 pl-8 space-y-8">
                         {[
-                            { title: "Configuration Locked", desc: "Specs are frozen and sent to engineering.", active: true },
-                            { title: "Engineering Validation", desc: "FEA Analysis & Load Rating verification.", active: false },
-                            { title: "Milling & Production", desc: "Aerospace-grade 6061-T6 forging process.", active: false },
-                            { title: "Quality Control", desc: "Hand-finished & laser inspected.", active: false },
-                            { title: "Global Shipping", desc: "Insured door-to-door delivery.", active: false },
+                            { 
+                                title: "Configuration Locked", 
+                                desc: "Specs are frozen and sent to engineering. We begin the custom 3D modeling of your wheels, precision-calculated for your car's exact technical specifications. (Immediately after payment)",
+                                active: true 
+                            },
+                            { 
+                                title: "Engineering Validation", 
+                                desc: "FEA Analysis & Load Rating verification. Every design is digitally stress-tested to ensure it exceeds structural requirements for your specific vehicle. (Week 1)",
+                                active: false 
+                            },
+                            { 
+                                title: "Milling & Production", 
+                                desc: "The aerospace-grade 6061-T6 forging process begins. Your wheels are CNC-machined from solid blocks of aluminum to bring the design to life. (Weeks 2-4)",
+                                active: false 
+                            },
+                            { 
+                                title: "Coating & Quality Control", 
+                                desc: "After hand-finishing and coating, each wheel undergoes a laser-inspected roundness test and a micrometer check to guarantee 100% perfection. (Weeks 4-5)",
+                                active: false 
+                            },
+                            { 
+                                title: "Global Shipping", 
+                                desc: "Insured door-to-door delivery. Your custom wheel set is securely packed and shipped. You will receive a tracking link the moment they are dispatched.",
+                                active: false 
+                            },
                         ].map((step, i) => (
                             <div key={i} className="relative">
                                 <div className={cn(
-                                    "absolute -left-[37px] w-4 h-4 rounded-full border-2",
-                                    step.active ? "bg-[#D4F846] border-[#D4F846] shadow-[0_0_10px_rgba(212,248,70,0.5)]" : "bg-gray-50 dark:bg-[#111] border-gray-300 dark:border-[#333]"
+                                    "absolute -left-[37px] w-4 h-4 rounded-full border-2 transition-colors duration-300",
+                                    step.active 
+                                        ? "bg-[#D4F846] border-[#D4F846] shadow-[0_0_10px_rgba(212,248,70,0.5)]" 
+                                        : "bg-gray-50 dark:bg-[#111] border-gray-300 dark:border-[#333]"
                                 )} />
                                 <h5 className={cn("text-xs font-bold uppercase mb-1", step.active ? "text-[#D4F846]" : "text-gray-600 dark:text-[#888]")}>{step.title}</h5>
-                                <p className="text-[10px] text-gray-500 dark:text-[#666] font-mono">{step.desc}</p>
+                                <p className="text-[10px] text-gray-500 dark:text-[#666] font-mono leading-relaxed">{step.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -888,17 +894,17 @@ export default function QuotationView({ data }: QuotationViewProps) {
       </motion.div>
 
        {/* Footer Anchor */}
-       <footer className="bg-gray-50 dark:bg-black border-t border-gray-200 dark:border-[#222] py-8 transition-colors duration-300">
+       <footer className="bg-gray-50 dark:bg-black border-t border-gray-200 dark:border-[#222] py-16 transition-colors duration-300">
             <div className="max-w-[1280px] mx-auto px-4 md:px-12 lg:px-24 flex flex-col md:flex-row justify-between items-center gap-6">
                 
-                <div className="flex flex-col items-start gap-2">
-                    <div className="flex items-center gap-4">
+                <div className="flex flex-col items-start gap-4">
+                    <div className="flex items-center gap-6">
                          {/* Logo */}
-                         <div className="relative w-20 h-5 opacity-90">
+                         <div className="relative w-32 h-8 opacity-90">
                            <Image src="/logo.png" alt="KORBACH" fill className="object-contain object-left dark:invert-0 invert" />
                          </div>
                          
-                         <div className="h-3 w-px bg-gray-300 dark:bg-[#333]" />
+                         <div className="h-4 w-px bg-gray-300 dark:bg-[#333]" />
                          
                          {/* Status Indicator */}
                          <div className="flex items-center gap-2">
