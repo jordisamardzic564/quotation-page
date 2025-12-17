@@ -9,7 +9,8 @@ import {
   Disc, 
   Lock,
   ArrowRight,
-  Loader2
+  Loader2,
+  ChevronDown
 } from 'lucide-react';
 import { Quotation, Product } from '@/types/quotation';
 import clsx from 'clsx';
@@ -327,6 +328,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
   
   const isFullPayment = data.payment_mode === 'full';
   const [isLoading, setIsLoading] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   // We keep the UI strictly English for now (no automatic locale-based switching).
   const t = {
@@ -718,7 +720,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 {/* 1. Header & Roadmap */}
                 <div>
                     {/* Main Header replaces "Production Slot" */}
-                    <h3 className="uppercase mb-8 text-black dark:text-white" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', marginTop: 0, marginBottom: 0 }}>
+                    <h3 className="uppercase mb-12 text-black dark:text-white" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', marginTop: 0, marginBottom: 0 }}>
                         Production Roadmap
                     </h3>
 
@@ -764,18 +766,52 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     </div>
                 </div>
 
-                {/* 3. FAQ (Compact) */}
+                {/* 3. FAQ (Accordion) */}
                 <div className="border-t border-gray-200 dark:border-[#333] pt-8">
                     <h4 className="text-sm font-bold uppercase text-black dark:text-[#EDEDED] mb-4">Frequently Asked Questions</h4>
-                    <div className="space-y-4">
-                        <div>
-                            <div className="text-xs text-black dark:text-[#EDEDED] font-bold mb-1">Can I change my specs after deposit?</div>
-                            <p className="text-[10px] text-gray-500 dark:text-[#666] leading-relaxed">Minor adjustments (finish/caps) are possible until the Engineering Sign-off. Structural changes require a re-quote.</p>
-                        </div>
-                        <div>
-                            <div className="text-xs text-black dark:text-[#EDEDED] font-bold mb-1">What about shipping costs?</div>
-                            <p className="text-[10px] text-gray-500 dark:text-[#666] leading-relaxed">Standard shipping is included. Expedited air freight can be arranged upon request before final balance payment.</p>
-                        </div>
+                    <div className="space-y-2">
+                        {[
+                            {
+                                question: "Can I change my specs after deposit?",
+                                answer: "Minor adjustments (finish/caps) are possible until the Engineering Sign-off. Structural changes require a re-quote."
+                            },
+                            {
+                                question: "What about shipping costs?",
+                                answer: "Standard shipping is included. Expedited air freight can be arranged upon request before final balance payment."
+                            }
+                        ].map((item, i) => (
+                            <div key={i} className="border-b border-gray-200 dark:border-[#333] last:border-0">
+                                <button
+                                    onClick={() => setOpenFaqIndex(openFaqIndex === i ? null : i)}
+                                    className="w-full flex justify-between items-center py-4 text-left group"
+                                >
+                                    <span className="text-xs text-black dark:text-[#EDEDED] font-bold group-hover:text-[#D4F846] transition-colors">
+                                        {item.question}
+                                    </span>
+                                    <ChevronDown 
+                                        className={cn(
+                                            "w-4 h-4 text-gray-500 dark:text-[#666] transition-transform duration-300",
+                                            openFaqIndex === i ? "rotate-180 text-[#D4F846]" : ""
+                                        )} 
+                                    />
+                                </button>
+                                <AnimatePresence>
+                                    {openFaqIndex === i && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: "auto", opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                                            className="overflow-hidden"
+                                        >
+                                            <p className="text-[10px] text-gray-500 dark:text-[#666] leading-relaxed pb-4 font-mono">
+                                                {item.answer}
+                                            </p>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>

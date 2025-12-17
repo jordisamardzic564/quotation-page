@@ -22,14 +22,14 @@ export function AnimatedThemeToggler({ className }: { className?: string }) {
   return (
     <button
       className={cn(
-        "relative inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#333] bg-[#111] text-[#EDEDED] transition-colors hover:bg-[#222] dark:border-[#333] dark:bg-[#111] dark:text-[#EDEDED] light:border-gray-200 light:bg-white light:text-black",
+        "relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-black transition-colors duration-300 hover:bg-gray-100 dark:border-[#333] dark:bg-[#111] dark:text-[#EDEDED] dark:hover:bg-[#222]",
         className
       )}
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label="Toggle theme"
     >
-      <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-black dark:text-white" />
-      <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-black dark:text-white" />
+      <Sun className="h-5 w-5 transition-all duration-500 ease-in-out rotate-0 scale-100 dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-5 w-5 transition-all duration-500 ease-in-out rotate-90 scale-0 dark:rotate-0 dark:scale-100" />
       <span className="sr-only">Toggle theme</span>
     </button>
   );
