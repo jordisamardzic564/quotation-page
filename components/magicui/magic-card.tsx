@@ -106,7 +106,7 @@ export function MagicCard({
         }}
       />
       {/* Background layer - using generic bg-background or transparent so parent controls it */}
-      <div className="absolute inset-px rounded-[inherit] bg-[#111]" /> 
+      <div className="absolute inset-px rounded-[inherit] bg-white dark:bg-[#111]" /> 
       
       <motion.div
         className="pointer-events-none absolute inset-px rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"

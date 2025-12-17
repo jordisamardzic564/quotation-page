@@ -16,6 +16,7 @@ import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { TextAnimate } from '@/components/magicui/text-animate';
 import { MagicCard } from '@/components/magicui/magic-card';
+import { AnimatedThemeToggler } from "@/components/magicui/animated-theme-toggler";
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -401,7 +402,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-transparent text-[#EDEDED] font-sans selection:bg-[#D4F846] selection:text-black overflow-x-hidden">
+    <div className="min-h-screen bg-white dark:bg-[#111] text-black dark:text-[#EDEDED] font-sans selection:bg-[#D4F846] selection:text-black overflow-x-hidden transition-colors duration-300">
       
       {/* INTRO OVERLAY */}
       <AnimatePresence>
@@ -459,7 +460,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
       <div className="fixed bottom-8 right-8 w-4 h-4 border-r border-b border-[#333] z-50 opacity-50" />
 
       {/* Header / Nav Anchor */}
-      <nav className="fixed top-0 w-full z-40 bg-[#161616]/90 backdrop-blur-sm border-b border-[#333]">
+      <nav className="fixed top-0 w-full z-40 bg-white/90 dark:bg-[#161616]/90 backdrop-blur-sm border-b border-gray-200 dark:border-[#333] transition-colors duration-300">
         <div className="max-w-[1280px] mx-auto px-4 md:px-12 lg:px-24 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
              <div className="relative w-40 h-10">
@@ -467,10 +468,10 @@ export default function QuotationView({ data }: QuotationViewProps) {
                  src="/logo.png"
                  alt="KORBACH"
                  fill
-                 className="object-contain object-left"
+                 className="object-contain object-left dark:invert-0 invert"
                />
              </div>
-             <div className="hidden md:flex items-center gap-2 text-[10px] font-mono text-[#666] border-l border-[#333] pl-4">
+             <div className="hidden md:flex items-center gap-2 text-[10px] font-mono text-gray-500 dark:text-[#666] border-l border-gray-200 dark:border-[#333] pl-4">
                 <span>EST 2020</span>
                 <span>DUTCH ENGINEERING</span>
              </div>
@@ -512,8 +513,8 @@ export default function QuotationView({ data }: QuotationViewProps) {
             {/* Left: The Visual */}
             <motion.div variants={itemVariants} className="relative order-2 lg:order-1">
                 <div className="relative w-full aspect-square max-w-2xl mx-auto p-8">
-                    <div className="absolute inset-0 border border-[#222] rounded-full opacity-20 scale-110" />
-                    <div className="absolute inset-0 border border-dashed border-[#333] rounded-full opacity-20 scale-125 animate-spin-slow duration-[60s]" />
+                    <div className="absolute inset-0 border border-gray-200 dark:border-[#222] rounded-full opacity-20 scale-110" />
+                    <div className="absolute inset-0 border border-dashed border-gray-300 dark:border-[#333] rounded-full opacity-20 scale-125 animate-spin-slow duration-[60s]" />
                     
                     {mainProduct.afbeelding ? (
                         <Image 
@@ -524,15 +525,15 @@ export default function QuotationView({ data }: QuotationViewProps) {
                             priority
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#111] rounded-2xl">
-                            <Disc className="w-24 h-24 text-[#333]" />
+                        <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-[#111] rounded-2xl">
+                            <Disc className="w-24 h-24 text-gray-300 dark:text-[#333]" />
                         </div>
                     )}
                 </div>
                 
                  {/* Technical Overlay Label for Wheels */}
-                 <div className="absolute bottom-4 left-4 bg-[#161616]/90 backdrop-blur-md border border-[#333] p-4 max-w-xs z-20 rounded-sm">
-                    <div className="text-[10px] text-[#666] uppercase font-mono mb-1">Spec.</div>
+                 <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-[#161616]/90 backdrop-blur-md border border-gray-200 dark:border-[#333] p-4 max-w-xs z-20 rounded-sm">
+                    <div className="text-[10px] text-gray-500 dark:text-[#666] uppercase font-mono mb-1">Spec.</div>
                     {wheelProducts.map((wheel, i) => {
                       const parsed = parseProduct(wheel);
                       const etMatch =
@@ -543,7 +544,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                         : "";
 
                       return (
-                        <div key={i} className="text-xs font-mono text-[#EDEDED]">
+                        <div key={i} className="text-xs font-mono text-black dark:text-[#EDEDED]">
                           {wheel.size} {etDisplay}
                         </div>
                       );
@@ -565,7 +566,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 </div>
                 
                 <h1
-                  className="text-5xl md:text-7xl lg:text-8xl tracking-tight mb-8 text-white"
+                  className="text-5xl md:text-7xl lg:text-8xl tracking-tight mb-8 text-black dark:text-white"
                   style={{
                     fontFamily: 'Ppmonumentextended, sans-serif',
                     fontWeight: 400,
@@ -575,15 +576,15 @@ export default function QuotationView({ data }: QuotationViewProps) {
                   }}
                 >
                     Prepared<br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-[#333]">For</span><br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-b from-black to-gray-500 dark:from-white dark:to-[#333]">For</span><br/>
                     {data.klant_naam.split(' ')[0]}
                 </h1>
 
                 <div className="border-l-2 border-[#D4F846] pl-6 mb-12">
-                    <p className="text-xl md:text-2xl text-[#EDEDED] font-light uppercase tracking-wide mb-2">
+                    <p className="text-xl md:text-2xl text-black dark:text-[#EDEDED] font-light uppercase tracking-wide mb-2">
                         {data.voertuig}
                     </p>
-                    <p className="text-[#666] text-sm max-w-md leading-relaxed">
+                    <p className="text-gray-500 dark:text-[#666] text-sm max-w-md leading-relaxed">
                         Precision engineered fitment. Optimized for weight reduction and structural integrity. 
                         Verified by Korbach Engineering Division.
                     </p>
@@ -591,21 +592,21 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
                  {/* Engineering Status - Authority */}
                  <div className="grid grid-cols-2 gap-4 max-w-md">
-                     <div className="flex items-center gap-3 border border-[#333] p-3 bg-[#111]">
+                     <div className="flex items-center gap-3 border border-gray-200 dark:border-[#333] p-3 bg-gray-50 dark:bg-[#111]">
                          <Check className="w-4 h-4 text-[#D4F846]" />
-                         <span className="text-xs font-mono text-[#AAA] uppercase">FEA Analysis</span>
+                         <span className="text-xs font-mono text-gray-400 dark:text-[#AAA] uppercase">FEA Analysis</span>
                      </div>
-                     <div className="flex items-center gap-3 border border-[#333] p-3 bg-[#111]">
+                     <div className="flex items-center gap-3 border border-gray-200 dark:border-[#333] p-3 bg-gray-50 dark:bg-[#111]">
                          <Check className="w-4 h-4 text-[#D4F846]" />
-                         <span className="text-xs font-mono text-[#AAA] uppercase">Fitment Verified</span>
+                         <span className="text-xs font-mono text-gray-400 dark:text-[#AAA] uppercase">Fitment Verified</span>
                      </div>
-                     <div className="flex items-center gap-3 border border-[#333] p-3 bg-[#111]">
+                     <div className="flex items-center gap-3 border border-gray-200 dark:border-[#333] p-3 bg-gray-50 dark:bg-[#111]">
                          <Check className="w-4 h-4 text-[#D4F846]" />
-                         <span className="text-xs font-mono text-[#AAA] uppercase">Load Rating OK</span>
+                         <span className="text-xs font-mono text-gray-400 dark:text-[#AAA] uppercase">Load Rating OK</span>
                      </div>
-                     <div className="flex items-center gap-3 border border-[#333] p-3 bg-[#111]">
+                     <div className="flex items-center gap-3 border border-gray-200 dark:border-[#333] p-3 bg-gray-50 dark:bg-[#111]">
                          <Check className="w-4 h-4 text-[#D4F846]" />
-                         <span className="text-xs font-mono text-[#AAA] uppercase">JWL/VIA Standard</span>
+                         <span className="text-xs font-mono text-gray-400 dark:text-[#AAA] uppercase">JWL/VIA Standard</span>
                      </div>
                  </div>
             </motion.div>
@@ -614,14 +615,14 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
         {/* Configuration List - Single List Preserving Order */}
         <section className="mb-32">
-            <div className="flex items-end justify-between mb-8 border-b border-[#333] pb-4">
-                <h2 className="uppercase tracking-wide" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>Build Configuration</h2>
-                <span className="font-mono text-[#666] text-xs">REF: {data.name}</span>
+            <div className="flex items-end justify-between mb-8 border-b border-gray-200 dark:border-[#333] pb-4">
+                <h2 className="uppercase tracking-wide text-black dark:text-white" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', marginTop: 0, marginBottom: 0 }}>Build Configuration</h2>
+                <span className="font-mono text-gray-500 dark:text-[#666] text-xs">REF: {data.name}</span>
             </div>
 
             <div className="flex flex-col">
                 {/* Header Row */}
-                <div className="grid grid-cols-12 gap-4 py-4 text-[10px] font-mono text-[#666] uppercase tracking-wider border-b border-[#333]">
+                <div className="grid grid-cols-12 gap-4 py-4 text-[10px] font-mono text-gray-500 dark:text-[#666] uppercase tracking-wider border-b border-gray-200 dark:border-[#333]">
                     <div className="col-span-2">SKU / Type</div>
                     <div className="col-span-6">Component / Specification</div>
                     <div className="col-span-2 text-right">Qty</div>
@@ -636,7 +637,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                       <motion.div
                         key={product.product_id}
                         variants={itemVariants}
-                        className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-8 border-b border-[#333] hover:border-[#D4F846] transition-colors relative"
+                        className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-8 border-b border-gray-200 dark:border-[#333] hover:border-[#D4F846] transition-colors relative"
                       >
                         <div className="absolute inset-0 bg-[#D4F846] opacity-0 group-hover:opacity-[0.02] transition-opacity pointer-events-none" />
 
@@ -645,26 +646,26 @@ export default function QuotationView({ data }: QuotationViewProps) {
                         </div>
                         <div className="col-span-12 md:col-span-6">
                           <h3
-                            className="text-xl font-bold uppercase mb-2"
+                            className="text-xl font-bold uppercase mb-2 text-black dark:text-white"
                             style={{ fontFamily: "Ppmonumentextended, sans-serif" }}
                           >
                             {product.parsed.title}
                           </h3>
-                          <p className="text-[#888] text-sm leading-relaxed">
+                          <p className="text-gray-600 dark:text-[#888] text-sm leading-relaxed">
                             {product.parsed.description}
                           </p>
                           {product.concaveProfile && (
                             <div className="flex gap-4 mt-4">
-                              <span className="text-xs font-mono bg-[#0f0f0f] px-3 py-1 border border-[#333] text-[#D4F846] uppercase tracking-wider">
+                              <span className="text-xs font-mono bg-gray-50 dark:bg-[#0f0f0f] px-3 py-1 border border-gray-200 dark:border-[#333] text-[#D4F846] uppercase tracking-wider">
                                 {product.concaveProfile} Concave
                               </span>
                             </div>
                           )}
                         </div>
-                        <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] flex items-start justify-end">
+                        <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] flex items-start justify-end">
                           {product.quantity}
                         </div>
-                        <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] text-lg">
+                        <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] text-lg">
                           {formatCurrency(product.prijs_per_stuk, data.valuta)}
                         </div>
                       </motion.div>
@@ -676,21 +677,21 @@ export default function QuotationView({ data }: QuotationViewProps) {
                         <motion.div 
                             key={product.product_id}
                             variants={itemVariants}
-                            className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-6 border-b border-[#333] hover:border-[#D4F846] transition-colors items-center relative"
+                            className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-6 border-b border-gray-200 dark:border-[#333] hover:border-[#D4F846] transition-colors items-center relative"
                         >
-                            <div className="col-span-12 md:col-span-2 font-mono text-[#666] text-xs group-hover:text-[#D4F846] transition-colors">
+                            <div className="col-span-12 md:col-span-2 font-mono text-gray-500 dark:text-[#666] text-xs group-hover:text-[#D4F846] transition-colors">
                                 {product.parsed.code || 'ENG-OPT'}
                             </div>
                             <div className="col-span-12 md:col-span-6">
                                 <h4
-                                  className="font-bold text-sm uppercase mb-1"
+                                  className="font-bold text-sm uppercase mb-1 text-black dark:text-white"
                                   style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
                                 >
                                   {product.parsed.title}
                                 </h4>
-                                <p className="text-[#666] text-xs font-mono">{product.parsed.description}</p>
+                                <p className="text-gray-500 dark:text-[#666] text-xs font-mono">{product.parsed.description}</p>
                             </div>
-                            <div className="col-span-6 md:col-span-2 text-right font-mono text-[#EDEDED] text-sm">
+                            <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] text-sm">
                                 {product.quantity}
                             </div>
                             <div className="col-span-6 md:col-span-2 text-right font-mono">
@@ -699,7 +700,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                                         Included
                                     </span>
                                 ) : (
-                                    <span className="text-[#EDEDED]">{formatCurrency(product.prijs_per_stuk, data.valuta)}</span>
+                                    <span className="text-black dark:text-[#EDEDED]">{formatCurrency(product.prijs_per_stuk, data.valuta)}</span>
                                 )}
                             </div>
                         </motion.div>
@@ -711,18 +712,18 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
 
         {/* Conversion / Payment Section */}
-        <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-[#333] pt-12 mb-32">
+        <section id="payment" className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-gray-200 dark:border-[#333] pt-12 mb-32">
             
             <div className="lg:col-span-6 space-y-12">
                 {/* 1. Header & Intro */}
                 <div>
-                    <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>
+                    <h3 className="uppercase mb-6 text-black dark:text-white" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', marginTop: 0, marginBottom: 0 }}>
                         {t.paymentTitle}
                     </h3>
-                    <p className="text-[#888] max-w-lg mb-8 leading-relaxed">
+                    <p className="text-gray-600 dark:text-[#888] max-w-lg mb-8 leading-relaxed">
                         {t.paymentDesc}
                     </p>
-                    <div className="flex items-center gap-4 text-xs font-mono text-[#666]">
+                    <div className="flex items-center gap-4 text-xs font-mono text-gray-500 dark:text-[#666]">
                         <div className="flex items-center gap-2">
                             <Lock className="w-3 h-3" />
                             <span>256-BIT ENCRYPTED</span>
@@ -736,8 +737,8 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
                 {/* 2. Production Roadmap */}
                 <div>
-                    <h4 className="text-sm font-bold uppercase text-[#EDEDED] mb-6 border-b border-[#333] pb-2 inline-block">Production Roadmap</h4>
-                    <div className="relative border-l border-[#333] ml-2 pl-8 space-y-8">
+                    <h4 className="text-sm font-bold uppercase text-black dark:text-[#EDEDED] mb-6 border-b border-gray-200 dark:border-[#333] pb-2 inline-block">Production Roadmap</h4>
+                    <div className="relative border-l border-gray-200 dark:border-[#333] ml-2 pl-8 space-y-8">
                         {[
                             { title: "Configuration Locked", desc: "Specs are frozen and sent to engineering.", active: true },
                             { title: "Engineering Validation", desc: "FEA Analysis & Load Rating verification.", active: false },
@@ -748,33 +749,33 @@ export default function QuotationView({ data }: QuotationViewProps) {
                             <div key={i} className="relative">
                                 <div className={cn(
                                     "absolute -left-[37px] w-4 h-4 rounded-full border-2",
-                                    step.active ? "bg-[#D4F846] border-[#D4F846] shadow-[0_0_10px_rgba(212,248,70,0.5)]" : "bg-[#111] border-[#333]"
+                                    step.active ? "bg-[#D4F846] border-[#D4F846] shadow-[0_0_10px_rgba(212,248,70,0.5)]" : "bg-gray-50 dark:bg-[#111] border-gray-300 dark:border-[#333]"
                                 )} />
-                                <h5 className={cn("text-xs font-bold uppercase mb-1", step.active ? "text-[#D4F846]" : "text-[#888]")}>{step.title}</h5>
-                                <p className="text-[10px] text-[#666] font-mono">{step.desc}</p>
+                                <h5 className={cn("text-xs font-bold uppercase mb-1", step.active ? "text-[#D4F846]" : "text-gray-600 dark:text-[#888]")}>{step.title}</h5>
+                                <p className="text-[10px] text-gray-500 dark:text-[#666] font-mono">{step.desc}</p>
                             </div>
                         ))}
                     </div>
                 </div>
 
                 {/* 3. FAQ (Compact) */}
-                <div className="border-t border-[#333] pt-8">
-                    <h4 className="text-sm font-bold uppercase text-[#EDEDED] mb-4">Frequently Asked Questions</h4>
+                <div className="border-t border-gray-200 dark:border-[#333] pt-8">
+                    <h4 className="text-sm font-bold uppercase text-black dark:text-[#EDEDED] mb-4">Frequently Asked Questions</h4>
                     <div className="space-y-4">
                         <div>
-                            <div className="text-xs text-[#EDEDED] font-bold mb-1">Can I change my specs after deposit?</div>
-                            <p className="text-[10px] text-[#666] leading-relaxed">Minor adjustments (finish/caps) are possible until the Engineering Sign-off. Structural changes require a re-quote.</p>
+                            <div className="text-xs text-black dark:text-[#EDEDED] font-bold mb-1">Can I change my specs after deposit?</div>
+                            <p className="text-[10px] text-gray-500 dark:text-[#666] leading-relaxed">Minor adjustments (finish/caps) are possible until the Engineering Sign-off. Structural changes require a re-quote.</p>
                         </div>
                         <div>
-                            <div className="text-xs text-[#EDEDED] font-bold mb-1">What about shipping costs?</div>
-                            <p className="text-[10px] text-[#666] leading-relaxed">Standard shipping is included. Expedited air freight can be arranged upon request before final balance payment.</p>
+                            <div className="text-xs text-black dark:text-[#EDEDED] font-bold mb-1">What about shipping costs?</div>
+                            <p className="text-[10px] text-gray-500 dark:text-[#666] leading-relaxed">Standard shipping is included. Expedited air freight can be arranged upon request before final balance payment.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <MagicCard 
-                className="lg:col-span-6 bg-[#333] relative"
+                className="lg:col-span-6 bg-white dark:bg-[#333] relative"
                 gradientColor="transparent"
                 gradientFrom="#D4F846"
                 gradientTo="#D4F846"
@@ -787,16 +788,16 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     
                     <div className="relative z-10">
                         <div className="flex justify-between items-end mb-2">
-                            <span className="text-[#666] font-mono uppercase text-sm">{t.totalExcl}</span>
-                            <span className="text-xl font-mono text-[#EDEDED] decoration-slice decoration-1 underline decoration-[#333] underline-offset-4">
+                            <span className="text-gray-500 dark:text-[#666] font-mono uppercase text-sm">{t.totalExcl}</span>
+                            <span className="text-xl font-mono text-black dark:text-[#EDEDED] decoration-slice decoration-1 underline decoration-gray-300 dark:decoration-[#333] underline-offset-4">
                                 {formatCurrency(data.totaal_excl, data.valuta)}
                             </span>
                         </div>
 
                         {data.has_tax && (
-                          <div className="flex justify-between items-end mb-8 border-b border-[#333] pb-4">
-                              <span className="text-[#444] font-mono uppercase text-xs">{t.totalIncl}</span>
-                              <span className="text-sm font-mono text-[#888]">
+                          <div className="flex justify-between items-end mb-8 border-b border-gray-200 dark:border-[#333] pb-4">
+                              <span className="text-gray-400 dark:text-[#444] font-mono uppercase text-xs">{t.totalIncl}</span>
+                              <span className="text-sm font-mono text-gray-600 dark:text-[#888]">
                                   {formatCurrency(data.totaal_incl ?? 0, data.valuta)}
                               </span>
                           </div>
@@ -808,7 +809,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                                     {t.totalDue}
                                 </span>
                                 {!isFullPayment && (
-                                    <span className="text-[10px] text-[#666] font-mono mt-1">
+                                    <span className="text-[10px] text-gray-500 dark:text-[#666] font-mono mt-1">
                                         {t.balanceDue}
                                     </span>
                                 )}
@@ -824,7 +825,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                             className={cn(
                                 "w-full font-bold uppercase font-extended tracking-widest py-6 transition-all transform flex items-center justify-center gap-4 group relative z-20",
                                 isExpired 
-                                    ? "bg-[#222] text-[#666] cursor-not-allowed border border-[#333]" 
+                                    ? "bg-gray-200 dark:bg-[#222] text-gray-500 dark:text-[#666] cursor-not-allowed border border-gray-300 dark:border-[#333]" 
                                     : "bg-[#D4F846] text-black hover:bg-white active:scale-[0.99] cursor-pointer disabled:opacity-70 disabled:cursor-wait"
                             )}
                         >
@@ -838,7 +839,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                             {/* Payment badges (Text-only) */}
                             <div className="flex flex-wrap justify-center gap-2 opacity-60">
                                 {["iDEAL", "Bancontact", "Visa", "Mastercard", "PayPal", "Bank transfer"].map((label) => (
-                                    <span key={label} className="text-[10px] font-mono border border-[#444] px-1.5 py-0.5 rounded text-[#888]">
+                                    <span key={label} className="text-[10px] font-mono border border-gray-300 dark:border-[#444] px-1.5 py-0.5 rounded text-gray-600 dark:text-[#888]">
                                         {label}
                                     </span>
                                 ))}
@@ -847,18 +848,18 @@ export default function QuotationView({ data }: QuotationViewProps) {
                             <a
                               href="#"
                               onClick={(e) => e.preventDefault()}
-                              className="text-[10px] font-mono text-[#666] underline underline-offset-4 hover:text-[#D4F846] transition-colors"
+                              className="text-[10px] font-mono text-gray-500 dark:text-[#666] underline underline-offset-4 hover:text-[#D4F846] transition-colors"
                             >
                               and 10+ other secure payment methods
                             </a>
                             
-                            <div className="flex items-center gap-2 text-[10px] text-[#666]">
+                            <div className="flex items-center gap-2 text-[10px] text-gray-500 dark:text-[#666]">
                                 <div className="w-1.5 h-1.5 bg-[#D4F846] rounded-full" />
                                 <span>Fully refundable until Design Sign-off</span>
                             </div>
 
-                            <div className="mt-4 pt-4 border-t border-[#333] w-full flex flex-col items-center">
-                                <div className="text-[10px] text-[#444] font-mono uppercase tracking-widest mb-3">{t.verifiedBy}</div>
+                            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-[#333] w-full flex flex-col items-center">
+                                <div className="text-[10px] text-gray-400 dark:text-[#444] font-mono uppercase tracking-widest mb-3">{t.verifiedBy}</div>
                                 
                                 {/* Vincent Avatar */}
                                 <div className="relative w-12 h-12 mb-3">
@@ -870,12 +871,12 @@ export default function QuotationView({ data }: QuotationViewProps) {
                                     />
                                 </div>
 
-                                <div className="text-xs text-[#888] font-bold uppercase" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>Vincent Pedroli</div>
+                                <div className="text-xs text-gray-600 dark:text-[#888] font-bold uppercase" style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}>Vincent Pedroli</div>
                                 <div className="text-[9px] text-[#D4F846] font-mono">Fitment Specialist</div>
                             </div>
                         </div>
 
-                        <p className="text-center mt-6 text-[#444] text-[10px] font-mono uppercase">
+                        <p className="text-center mt-6 text-gray-400 dark:text-[#444] text-[10px] font-mono uppercase">
                             {t.terms}
                         </p>
                     </div>
@@ -886,14 +887,36 @@ export default function QuotationView({ data }: QuotationViewProps) {
 
       </motion.div>
 
-       {/* Footer Anchor - Copy of Main Site Footer */}
-       <footer className="bg-black border-t border-[#222] py-12">
+       {/* Footer Anchor */}
+       <footer className="bg-gray-50 dark:bg-black border-t border-gray-200 dark:border-[#222] py-8 transition-colors duration-300">
             <div className="max-w-[1280px] mx-auto px-4 md:px-12 lg:px-24 flex flex-col md:flex-row justify-between items-center gap-6">
-                <div className="text-[#333] font-extended uppercase tracking-widest text-sm">
-                    Korbach Forged ///
+                
+                <div className="flex flex-col items-start gap-2">
+                    <div className="flex items-center gap-4">
+                         {/* Logo */}
+                         <div className="relative w-20 h-5 opacity-90">
+                           <Image src="/logo.png" alt="KORBACH" fill className="object-contain object-left dark:invert-0 invert" />
+                         </div>
+                         
+                         <div className="h-3 w-px bg-gray-300 dark:bg-[#333]" />
+                         
+                         {/* Status Indicator */}
+                         <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 relative">
+                                <div className="absolute inset-0 bg-emerald-500 rounded-full animate-ping opacity-75" />
+                            </div>
+                            <span className="text-[10px] text-gray-500 dark:text-[#666] font-mono uppercase tracking-wide">All systems operational</span>
+                         </div>
+                    </div>
+                    
+                    <div className="text-gray-500 dark:text-[#333] font-mono text-[10px] uppercase tracking-wider">
+                        © {new Date().getFullYear()} Korbach Forged. All rights reserved.
+                    </div>
                 </div>
-                <div className="text-[#333] font-mono text-[10px]">
-                    © {new Date().getFullYear()} KORBACH GMBH. ALL RIGHTS RESERVED.
+
+                {/* Right side: Theme Toggler */}
+                <div>
+                   <AnimatedThemeToggler />
                 </div>
             </div>
        </footer>
