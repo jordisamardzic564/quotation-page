@@ -9,7 +9,12 @@ import {
   Disc, 
   Lock,
   ArrowRight,
-  Loader2
+  Loader2,
+  ChevronDown,
+  Clock,
+  Truck,
+  FileCheck,
+  Hammer
 } from 'lucide-react';
 import { Quotation, Product } from '@/types/quotation';
 import clsx from 'clsx';
@@ -328,6 +333,8 @@ export default function QuotationView({ data }: QuotationViewProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   // We keep the UI strictly English for now (no automatic locale-based switching).
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
+
   const t = {
     paymentTitle: isFullPayment ? 'Complete Your Order' : 'Production Slot',
 
@@ -717,9 +724,66 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 <h3 className="uppercase mb-6" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', color: '#fff', marginTop: 0, marginBottom: 0 }}>
                     {t.paymentTitle}
                 </h3>
-                <p className="text-[#888] max-w-lg mb-8">
+                <p className="text-[#888] max-w-lg mb-8 leading-relaxed">
                     {t.paymentDesc}
                 </p>
+
+                {/* Timeline: What happens next? */}
+                <div className="mb-12">
+                    <h4 className="text-xs font-mono uppercase text-[#666] mb-6 tracking-widest">What happens next?</h4>
+                    <div className="relative border-l border-[#333] ml-2 space-y-8 pb-2">
+                        {[
+                            { icon: FileCheck, title: "Order Confirmation", desc: "You receive an instant confirmation and invoice." },
+                            { icon: Hammer, title: "Engineering & Milling", desc: "Your configuration enters our precision milling queue." },
+                            { icon: Truck, title: "Quality Control & Shipping", desc: "After strict QC, we ship via insured express freight." }
+                        ].map((step, idx) => (
+                            <div key={idx} className="relative pl-8 group">
+                                <div className="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-[#111] border border-[#444] group-hover:border-[#D4F846] group-hover:bg-[#D4F846] transition-colors" />
+                                <h5 className="text-[#EDEDED] font-bold text-sm uppercase mb-1 flex items-center gap-2">
+                                    {step.title}
+                                </h5>
+                                <p className="text-[#666] text-xs leading-relaxed max-w-xs">{step.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* FAQ Accordion */}
+                <div className="mb-8">
+                     <h4 className="text-xs font-mono uppercase text-[#666] mb-4 tracking-widest">Frequently Asked Questions</h4>
+                     <div className="space-y-2">
+                        {[
+                            { q: "What is the estimated delivery time?", a: "Standard production takes 4-5 weeks. Shipping within EU takes 3-5 business days." },
+                            { q: "Is my deposit refundable?", a: "Yes, the deposit is fully refundable until you sign off on the final 3D engineering files." },
+                            { q: "Do you ship worldwide?", a: "Yes, we ship globally with fully insured specialized freight partners." }
+                        ].map((faq, idx) => (
+                            <div key={idx} className="border border-[#222] bg-[#111] rounded overflow-hidden">
+                                <button 
+                                    onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
+                                    className="w-full flex items-center justify-between p-4 text-left hover:bg-[#1a1a1a] transition-colors"
+                                >
+                                    <span className="text-xs font-bold text-[#EDEDED] uppercase">{faq.q}</span>
+                                    <ChevronDown className={cn("w-4 h-4 text-[#666] transition-transform", activeFaq === idx ? "rotate-180" : "")} />
+                                </button>
+                                <AnimatePresence>
+                                    {activeFaq === idx && (
+                                        <motion.div 
+                                            initial={{ height: 0 }}
+                                            animate={{ height: "auto" }}
+                                            exit={{ height: 0 }}
+                                            className="overflow-hidden"
+                                        >
+                                            <div className="p-4 pt-0 text-xs text-[#888] leading-relaxed border-t border-[#222]">
+                                                {faq.a}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        ))}
+                     </div>
+                </div>
+
                 <div className="flex items-center gap-4 text-xs font-mono text-[#666]">
                     <div className="flex items-center gap-2">
                         <Lock className="w-3 h-3" />
