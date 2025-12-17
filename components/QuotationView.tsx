@@ -720,7 +720,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                 {/* 1. Header & Roadmap */}
                 <div>
                     {/* Main Header replaces "Production Slot" */}
-                    <h3 className="uppercase mb-12 text-black dark:text-white" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', marginTop: 0, marginBottom: 0 }}>
+                    <h3 className="uppercase mb-16 text-black dark:text-white" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', marginTop: 0, marginBottom: 0 }}>
                         Production Roadmap
                     </h3>
 
@@ -760,7 +760,7 @@ export default function QuotationView({ data }: QuotationViewProps) {
                                         : "bg-gray-50 dark:bg-[#111] border-gray-300 dark:border-[#333]"
                                 )} />
                                 <h5 className={cn("text-xs font-bold uppercase mb-1", step.active ? "text-[#D4F846]" : "text-gray-600 dark:text-[#888]")}>{step.title}</h5>
-                                <p className="text-[10px] text-gray-500 dark:text-[#666] font-mono leading-relaxed">{step.desc}</p>
+                                <p className="text-xs text-gray-500 dark:text-[#666] font-mono leading-relaxed">{step.desc}</p>
                             </div>
                         ))}
                     </div>
