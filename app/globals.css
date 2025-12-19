@@ -26,6 +26,19 @@
 :root {
   --background: #161616; /* Matches .bg-section.hero */
   --foreground: #EDEDED;
+  --grid-color: #e5e5e5;
+}
+
+.dark {
+  --grid-color: #333;
+}
+
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-position: center top;
 }
 
 body {
@@ -35,26 +48,6 @@ body {
   /* Verwijder de global grid/gradient background, deze staat niet in de webflow styling */
   background-image: none;
   position: relative;
-}
-
-/* Subtle grid overlay - VEEL subtieler maken, of weghalen als het niet past */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: 
-    linear-gradient(to right, #333 1px, transparent 1px),
-    linear-gradient(to bottom, #333 1px, transparent 1px);
-  background-size: 60px 60px;
-  background-position: center top;
-  opacity: 0.05; /* Heel subtiel, nauwelijks zichtbaar */
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* Radial Glow - Verwijderd, dit gaf de "grijze waas" */
-body::after {
-  display: none;
 }
 
 /* Custom Scrollbar */

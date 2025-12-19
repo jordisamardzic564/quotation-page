@@ -404,7 +404,10 @@ export default function QuotationView({ data }: QuotationViewProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#111] text-black dark:text-[#EDEDED] font-sans selection:bg-[#D4F846] selection:text-black overflow-x-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#111] text-black dark:text-[#EDEDED] font-sans selection:bg-[#D4F846] selection:text-black overflow-x-hidden transition-colors duration-300 relative">
+      
+      {/* Background Grid Pattern */}
+      <div className="fixed inset-0 z-0 bg-grid-pattern opacity-[0.15] pointer-events-none" />
       
       {/* INTRO OVERLAY */}
       <AnimatePresence>
