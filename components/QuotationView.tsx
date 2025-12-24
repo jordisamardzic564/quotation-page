@@ -299,6 +299,8 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
   const [isExpired, setIsExpired] = useState<boolean>(false);
 
   useEffect(() => {
+    if (mode === 'order') return; // Geen countdown nodig bij orders
+
     const calculateTimeLeft = () => {
       if (!data.geldig_tot) return;
       const validUntil = new Date(data.geldig_tot).getTime();
@@ -394,7 +396,9 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
   // Intro State
   const [showIntro, setShowIntro] = useState(true);
   const displayId = data.name;
-  const introLine1 = `Quotation ${displayId} personally curated for`;
+  const introLine1 = mode === 'order'
+    ? `Sales Order ${displayId} for`
+    : `Quotation ${displayId} personally curated for`;
   const introLine2 = data.klant_naam;
 
   useEffect(() => {
@@ -562,12 +566,17 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
             {/* Right: The Typography */}
             <motion.div variants={itemVariants} className="order-1 lg:order-2">
                 <div id="quote-status-bar" className={cn("flex items-center gap-2 mb-6 transition-colors duration-300", isExpired ? "expired-status" : "")}>
-                    <div className={cn("w-2 h-2 transition-colors duration-300", isExpired ? "bg-red-600" : "bg-[#D4F846] animate-pulse")} />
+                    <div className={cn("w-2 h-2 transition-colors duration-300", 
+                        mode === 'order' ? "bg-[#D4F846]" : (isExpired ? "bg-red-600" : "bg-[#D4F846] animate-pulse")
+                    )} />
                     <span className={cn(
                         "font-mono text-xs uppercase tracking-widest transition-colors duration-300",
-                        isExpired ? "text-red-600 font-bold" : "text-[#D4F846]"
+                        isExpired && mode !== 'order' ? "text-red-600 font-bold" : "text-[#D4F846]"
                     )}>
-                        {timeLeft || "CALCULATING..."}
+                        {mode === 'order' 
+                            ? `Order Date: ${new Date(data.geldig_tot).toLocaleDateString('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
+                            : (timeLeft || "CALCULATING...")
+                        }
                     </span>
                 </div>
                 
