@@ -147,9 +147,11 @@ export default async function OffertePage({
     );
   }
 
+  const mode = (quotation.state === 'sale' || quotation.state === 'done') ? 'order' : 'quotation';
+
   return (
     <main className="min-h-screen">
-      <QuotationView data={quotation} />
+      <QuotationView data={quotation} mode={mode} />
     </main>
   );
 }

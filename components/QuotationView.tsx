@@ -25,6 +25,7 @@ function cn(...inputs: (string | undefined | null | false)[]) {
 
 interface QuotationViewProps {
   data: Quotation;
+  mode?: 'quotation' | 'order';
 }
 
 const formatCurrency = (amount: number, currency: string) => {
@@ -142,7 +143,7 @@ type EnrichedProduct = Product & {
   parsed: { title: string; description: string; code: string };
 };
 
-export default function QuotationView({ data }: QuotationViewProps) {
+export default function QuotationView({ data, mode = 'quotation' }: QuotationViewProps) {
   // === DATA PREPARATION ===
   // We verwerken de productenlijst één keer om te bepalen wat velgen zijn en wat niet.
   // We behouden de originele volgorde van Odoo voor de weergave in de tabel.
@@ -580,9 +581,11 @@ export default function QuotationView({ data }: QuotationViewProps) {
                     marginBottom: '16px',
                   }}
                 >
-                    Prepared<br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-b from-black to-gray-500 dark:from-white dark:to-[#333]">For</span><br/>
-                    {data.klant_naam.split(' ')[0]}
+                    {mode === 'order' ? 'Order' : 'Prepared'}<br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-b from-black to-gray-500 dark:from-white dark:to-[#333]">
+                        {mode === 'order' ? 'Confirmed' : 'For'}
+                    </span><br/>
+                    {mode !== 'order' && data.klant_naam.split(' ')[0]}
                 </h1>
 
                 <div className="border-l-2 border-[#D4F846] pl-6 mb-12">
@@ -732,37 +735,46 @@ export default function QuotationView({ data }: QuotationViewProps) {
                             { 
                                 title: "Configuration Locked", 
                                 desc: "Specs are frozen and sent to engineering. We begin the custom 3D modeling of your wheels, precision-calculated for your car's exact technical specifications. (Immediately after payment)",
-                                active: true 
+                                active: mode === 'quotation',
+                                completed: mode === 'order'
                             },
                             { 
                                 title: "Engineering Validation", 
                                 desc: "FEA Analysis & Load Rating verification. Every design is digitally stress-tested to ensure it exceeds structural requirements for your specific vehicle. (Week 1)",
-                                active: false 
+                                active: mode === 'order',
+                                completed: false
                             },
                             { 
                                 title: "Milling & Production", 
                                 desc: "The aerospace-grade 6061-T6 forging process begins. Your wheels are CNC-machined from solid blocks of aluminum to bring the design to life. (Weeks 2-4)",
-                                active: false 
+                                active: false,
+                                completed: false
                             },
                             { 
                                 title: "Coating & Quality Control", 
                                 desc: "After hand-finishing and coating, each wheel undergoes a laser-inspected roundness test and a micrometer check to guarantee 100% perfection. (Weeks 4-5)",
-                                active: false 
+                                active: false,
+                                completed: false
                             },
                             { 
                                 title: "Global Shipping", 
                                 desc: "Insured door-to-door delivery. Your custom wheel set is securely packed and shipped. You will receive a tracking link the moment they are dispatched.",
-                                active: false 
+                                active: false,
+                                completed: false
                             },
                         ].map((step, i) => (
                             <div key={i} className="relative">
                                 <div className={cn(
-                                    "absolute -left-[37px] w-4 h-4 rounded-full border-2 transition-colors duration-300",
-                                    step.active 
-                                        ? "bg-[#D4F846] border-[#D4F846] shadow-[0_0_10px_rgba(212,248,70,0.5)]" 
-                                        : "bg-gray-50 dark:bg-[#111] border-gray-300 dark:border-[#333]"
-                                )} />
-                                <h5 className={cn("text-xs font-bold uppercase mb-1", step.active ? "text-[#D4F846]" : "text-gray-600 dark:text-[#888]")}>{step.title}</h5>
+                                    "absolute -left-[37px] w-4 h-4 rounded-full border-2 transition-colors duration-300 flex items-center justify-center",
+                                    step.completed
+                                        ? "bg-[#D4F846] border-[#D4F846]"
+                                        : step.active 
+                                            ? "bg-[#D4F846] border-[#D4F846] shadow-[0_0_10px_rgba(212,248,70,0.5)]" 
+                                            : "bg-gray-50 dark:bg-[#111] border-gray-300 dark:border-[#333]"
+                                )}>
+                                    {step.completed && <Check className="w-3 h-3 text-black" />}
+                                </div>
+                                <h5 className={cn("text-xs font-bold uppercase mb-1", (step.active || step.completed) ? "text-[#D4F846]" : "text-gray-600 dark:text-[#888]")}>{step.title}</h5>
                                 <p className="text-xs text-gray-500 dark:text-[#666] font-mono leading-relaxed">{step.desc}</p>
                             </div>
                         ))}
@@ -851,9 +863,9 @@ export default function QuotationView({ data }: QuotationViewProps) {
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
                             <div className="flex flex-col">
                                 <span className="text-[#D4F846] font-mono uppercase text-sm font-bold max-w-[200px] md:max-w-none leading-snug">
-                                    {t.totalDue}
+                                    {mode === 'order' ? 'Amount Paid' : t.totalDue}
                                 </span>
-                                {!isFullPayment && (
+                                {!isFullPayment && mode !== 'order' && (
                                     <span className="text-[10px] text-gray-500 dark:text-[#666] font-mono mt-1">
                                         {t.balanceDue}
                                     </span>
@@ -864,20 +876,27 @@ export default function QuotationView({ data }: QuotationViewProps) {
                             </span>
                         </div>
 
-                        <button 
-                            onClick={handlePayment}
-                            disabled={isLoading || isExpired}
-                            className={cn(
-                                "w-full font-bold uppercase font-extended tracking-widest py-6 transition-all transform flex items-center justify-center gap-4 group relative z-20",
-                                isExpired 
-                                    ? "bg-gray-200 dark:bg-[#222] text-gray-500 dark:text-[#666] cursor-not-allowed border border-gray-300 dark:border-[#333]" 
-                                    : "bg-[#D4F846] text-black hover:bg-white active:scale-[0.99] cursor-pointer disabled:opacity-70 disabled:cursor-wait"
-                            )}
-                        >
-                            {isExpired ? 'OFFER EXPIRED' : (isLoading ? 'Processing...' : t.buttonText)}
-                            {!isLoading && !isExpired && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
-                            {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
-                        </button>
+                        {mode === 'order' ? (
+                             <div className="w-full font-bold uppercase font-extended tracking-widest py-6 bg-[#D4F846]/10 border border-[#D4F846]/20 text-[#D4F846] flex items-center justify-center gap-4 cursor-default">
+                                <ShieldCheck className="w-5 h-5" />
+                                Payment Received
+                            </div>
+                        ) : (
+                            <button 
+                                onClick={handlePayment}
+                                disabled={isLoading || isExpired}
+                                className={cn(
+                                    "w-full font-bold uppercase font-extended tracking-widest py-6 transition-all transform flex items-center justify-center gap-4 group relative z-20",
+                                    isExpired 
+                                        ? "bg-gray-200 dark:bg-[#222] text-gray-500 dark:text-[#666] cursor-not-allowed border border-gray-300 dark:border-[#333]" 
+                                        : "bg-[#D4F846] text-black hover:bg-white active:scale-[0.99] cursor-pointer disabled:opacity-70 disabled:cursor-wait"
+                                )}
+                            >
+                                {isExpired ? 'OFFER EXPIRED' : (isLoading ? 'Processing...' : t.buttonText)}
+                                {!isLoading && !isExpired && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                                {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
+                            </button>
+                        )}
                         
                         {/* Trust & Conversion Elements */}
                         <div className="mt-8 flex flex-col items-center gap-4">

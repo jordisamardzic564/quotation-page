@@ -27,4 +27,5 @@ export interface Quotation {
   geldig_tot: string;
   has_tax?: boolean;
   totaal_incl?: number;
+  state?: 'draft' | 'sent' | 'sale' | 'done' | 'cancel';
 }
