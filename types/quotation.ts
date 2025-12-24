@@ -25,6 +25,7 @@ export interface Quotation {
   valuta: string;
   payment_mode?: 'deposit' | 'full';
   geldig_tot: string;
+  order_datum?: string;
   has_tax?: boolean;
   totaal_incl?: number;
   state?: 'draft' | 'sent' | 'sale' | 'done' | 'cancel';

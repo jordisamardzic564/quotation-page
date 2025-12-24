@@ -574,7 +574,7 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                         isExpired && mode !== 'order' ? "text-red-600 font-bold" : "text-[#D4F846]"
                     )}>
                         {mode === 'order' 
-                            ? `Order Date: ${new Date(data.geldig_tot).toLocaleDateString('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
+                            ? `Order Date: ${data.order_datum ? new Date(data.order_datum).toLocaleDateString('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Pending'}`
                             : (timeLeft || "CALCULATING...")
                         }
                     </span>
