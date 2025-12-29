@@ -433,7 +433,7 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                   animation="blurIn" 
                   by="character" 
                   duration={2} 
-                  className="text-lg md:text-3xl text-[#EDEDED] font-light uppercase tracking-wide leading-tight mb-2 block max-w-full break-words"
+                  className="text-xs md:text-3xl text-[#EDEDED] font-light uppercase tracking-wide leading-tight mb-4 block max-w-full"
                   style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
                 >
                   {introLine1}
@@ -444,7 +444,7 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                   by="character" 
                   duration={1}
                   delay={2}
-                  className="text-2xl md:text-5xl text-[#EDEDED] font-bold uppercase tracking-wide leading-tight block text-[#D4F846] max-w-full break-words"
+                  className="text-xl md:text-5xl text-[#EDEDED] font-bold uppercase tracking-wide leading-tight block text-[#D4F846] max-w-full"
                   style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
                 >
                   {introLine2}
