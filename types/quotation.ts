@@ -29,4 +29,5 @@ export interface Quotation {
   has_tax?: boolean;
   totaal_incl?: number;
   state?: 'draft' | 'sent' | 'sale' | 'done' | 'cancel';
+  x_studio_production_start_date?: string;
 }

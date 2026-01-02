@@ -333,6 +333,62 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
   const [isLoading, setIsLoading] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
+  // === ROADMAP LOGIC ===
+  const getProductionProgress = () => {
+    if (!data.x_studio_production_start_date) return null;
+    
+    const start = new Date(data.x_studio_production_start_date).getTime();
+    if (Number.isNaN(start)) return null;
+
+    const now = new Date().getTime();
+    // Verschil in milliseconden -> dagen
+    const daysPassed = (now - start) / (1000 * 60 * 60 * 24);
+    
+    return daysPassed;
+  };
+
+  const daysInProduction = getProductionProgress();
+
+  const roadmapSteps = [
+    { 
+        title: "Configuration Locked", 
+        desc: "Specs are frozen and sent to engineering. We begin the custom 3D modeling of your wheels, precision-calculated for your car's exact technical specifications. (Immediately after payment)",
+        active: mode === 'quotation',
+        completed: mode === 'order'
+    },
+    { 
+        title: "Engineering Validation", 
+        desc: "FEA Analysis & Load Rating verification. Every design is digitally stress-tested to ensure it exceeds structural requirements for your specific vehicle. (Week 1)",
+        // Active als order confirmed is, maar productie datum nog niet bekend/gevuld
+        active: mode === 'order' && daysInProduction === null,
+        // Completed zodra we een startdatum hebben
+        completed: daysInProduction !== null
+    },
+    { 
+        title: "Milling & Production", 
+        desc: "The aerospace-grade 6061-T6 forging process begins. Your wheels are CNC-machined from solid blocks of aluminum to bring the design to life. (Weeks 2-4)",
+        // Active: we zijn gestart, maar nog geen 14 dagen verder
+        active: daysInProduction !== null && daysInProduction < 14,
+        // Completed: we zijn 14 dagen of langer onderweg
+        completed: daysInProduction !== null && daysInProduction >= 14
+    },
+    { 
+        title: "Coating & Quality Control", 
+        desc: "After hand-finishing and coating, each wheel undergoes a laser-inspected roundness test and a micrometer check to guarantee 100% perfection. (Weeks 4-5)",
+        // Active: tussen dag 14 en 17
+        active: daysInProduction !== null && daysInProduction >= 14 && daysInProduction < 17,
+        // Completed: na dag 17
+        completed: daysInProduction !== null && daysInProduction >= 17
+    },
+    { 
+        title: "Global Shipping", 
+        desc: "Insured door-to-door delivery. Your custom wheel set is securely packed and shipped. You will receive a tracking link the moment they are dispatched.",
+        // Active: na dag 17 (laatste stap)
+        active: daysInProduction !== null && daysInProduction >= 17,
+        completed: false
+    },
+  ];
+
   // We keep the UI strictly English for now (no automatic locale-based switching).
   const t = {
     paymentTitle: isFullPayment ? 'Complete Your Order' : 'Production Slot',
@@ -742,38 +798,7 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                     </h3>
 
                     <div className="relative border-l border-gray-200 dark:border-[#333] ml-2 pl-8 space-y-8">
-                        {[
-                            { 
-                                title: "Configuration Locked", 
-                                desc: "Specs are frozen and sent to engineering. We begin the custom 3D modeling of your wheels, precision-calculated for your car's exact technical specifications. (Immediately after payment)",
-                                active: mode === 'quotation',
-                                completed: mode === 'order'
-                            },
-                            { 
-                                title: "Engineering Validation", 
-                                desc: "FEA Analysis & Load Rating verification. Every design is digitally stress-tested to ensure it exceeds structural requirements for your specific vehicle. (Week 1)",
-                                active: mode === 'order',
-                                completed: false
-                            },
-                            { 
-                                title: "Milling & Production", 
-                                desc: "The aerospace-grade 6061-T6 forging process begins. Your wheels are CNC-machined from solid blocks of aluminum to bring the design to life. (Weeks 2-4)",
-                                active: false,
-                                completed: false
-                            },
-                            { 
-                                title: "Coating & Quality Control", 
-                                desc: "After hand-finishing and coating, each wheel undergoes a laser-inspected roundness test and a micrometer check to guarantee 100% perfection. (Weeks 4-5)",
-                                active: false,
-                                completed: false
-                            },
-                            { 
-                                title: "Global Shipping", 
-                                desc: "Insured door-to-door delivery. Your custom wheel set is securely packed and shipped. You will receive a tracking link the moment they are dispatched.",
-                                active: false,
-                                completed: false
-                            },
-                        ].map((step, i) => (
+                        {roadmapSteps.map((step, i) => (
                             <div key={i} className="relative">
                                 <div className={cn(
                                     "absolute -left-[37px] w-4 h-4 rounded-full border-2 transition-colors duration-300 flex items-center justify-center",
