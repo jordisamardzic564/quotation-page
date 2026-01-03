@@ -407,7 +407,9 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
 
     totalExcl: "Total Excl. VAT",
     totalIncl: "Total Incl. VAT",
-    totalDue: isFullPayment ? "Total Due (Incl. VAT)" : "30% Deposit (Incl. VAT)",
+    totalDue: isFullPayment 
+      ? (data.has_tax ? "Total Due (Incl. VAT)" : "Total Due (excl. VAT)")
+      : (data.has_tax ? "30% Deposit (Incl. VAT)" : "30% Deposit (excl. VAT)"),
 
     balanceDue: "Balance due before shipping",
 
