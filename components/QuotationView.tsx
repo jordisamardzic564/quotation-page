@@ -342,9 +342,24 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
   const [showStickyBar, setShowStickyBar] = useState(false);
 
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     const handleScroll = () => {
-      setShowStickyBar(window.scrollY > 600);
+      const currentScrollY = window.scrollY;
+      const isScrollingDown = currentScrollY > lastScrollY;
+      const isBelowThreshold = currentScrollY > 600;
+
+      // Toon alleen als we naar beneden scrollen EN voorbij de threshold zijn
+      // Of verberg als we naar boven scrollen
+      if (isBelowThreshold && isScrollingDown) {
+        setShowStickyBar(true);
+      } else if (!isScrollingDown || !isBelowThreshold) {
+        setShowStickyBar(false);
+      }
+
+      lastScrollY = currentScrollY;
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
