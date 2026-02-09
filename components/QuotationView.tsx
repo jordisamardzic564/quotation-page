@@ -704,14 +704,20 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                 <span className="font-mono text-gray-500 dark:text-[#666] text-xs">REF: {data.name}</span>
             </div>
 
-            <div className="flex flex-col">
+            <motion.div 
+                className="flex flex-col"
+                variants={containerVariants}
+            >
                 {/* Header Row */}
-                <div className="grid grid-cols-12 gap-4 py-4 text-[10px] font-mono text-gray-500 dark:text-[#666] uppercase tracking-wider border-b border-gray-200 dark:border-[#333]">
+                <motion.div 
+                    variants={itemVariants}
+                    className="grid grid-cols-12 gap-4 py-4 text-[10px] font-mono text-gray-500 dark:text-[#666] uppercase tracking-wider border-b border-gray-200 dark:border-[#333]"
+                >
                     <div className="col-span-2">SKU / Type</div>
                     <div className="col-span-6">Component / Specification</div>
                     <div className="col-span-2 text-right">Qty</div>
                     <div className="col-span-2 text-right">Value</div>
-                </div>
+                </motion.div>
 
                 {/* All Products in Original Order */}
                 {enrichedProducts.map((product) => {
@@ -791,7 +797,7 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                     );
                   }
                 })}
-            </div>
+            </motion.div>
         </section>
 
 
