@@ -713,10 +713,16 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                     variants={itemVariants}
                     className="grid grid-cols-12 gap-4 py-4 text-[10px] font-mono text-gray-500 dark:text-[#666] uppercase tracking-wider border-b border-gray-200 dark:border-[#333]"
                 >
-                    <div className="col-span-2">SKU / Type</div>
-                    <div className="col-span-6">Component / Specification</div>
-                    <div className="col-span-2 text-right">Qty</div>
-                    <div className="col-span-2 text-right">Value</div>
+                    {/* Mobile Header Layout */}
+                    <div className="col-span-7 md:hidden">Product</div>
+                    <div className="col-span-1 col-start-8 text-right md:hidden">Qty</div>
+                    <div className="col-span-3 col-start-10 text-right md:hidden">Value</div>
+
+                    {/* Desktop Header Layout */}
+                    <div className="hidden md:block col-span-2">SKU / Type</div>
+                    <div className="hidden md:block col-span-6">Component / Specification</div>
+                    <div className="hidden md:block col-span-2 text-right">Qty</div>
+                    <div className="hidden md:block col-span-2 text-right">Value</div>
                 </motion.div>
 
                 {/* All Products in Original Order */}
@@ -752,10 +758,10 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                             </div>
                           )}
                         </div>
-                        <div className="col-span-2 md:col-span-2 col-start-9 md:col-start-auto text-right font-mono text-black dark:text-[#EDEDED] flex items-start justify-end text-xs md:text-base mt-2 md:mt-0">
+                        <div className="col-span-1 md:col-span-2 col-start-8 md:col-start-auto text-right font-mono text-black dark:text-[#EDEDED] flex items-start justify-end text-xs md:text-base mt-2 md:mt-0">
                           {product.quantity}
                         </div>
-                        <div className="col-span-2 md:col-span-2 col-start-11 md:col-start-auto text-right font-mono text-black dark:text-[#EDEDED] text-sm md:text-lg mt-2 md:mt-0">
+                        <div className="col-span-3 md:col-span-2 col-start-10 md:col-start-auto text-right font-mono text-black dark:text-[#EDEDED] text-sm md:text-lg mt-2 md:mt-0">
                           {formatCurrency(product.prijs_per_stuk, data.valuta)}
                         </div>
                       </motion.div>
@@ -781,10 +787,10 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                                 </h4>
                                 <p className="text-gray-500 dark:text-[#666] text-[10px] md:text-xs font-mono leading-tight">{product.parsed.description}</p>
                             </div>
-                            <div className="col-span-2 md:col-span-2 col-start-9 md:col-start-auto text-right font-mono text-black dark:text-[#EDEDED] text-xs md:text-sm mt-1 md:mt-0">
+                            <div className="col-span-1 md:col-span-2 col-start-8 md:col-start-auto text-right font-mono text-black dark:text-[#EDEDED] text-xs md:text-sm mt-1 md:mt-0">
                                 {product.quantity}
                             </div>
-                            <div className="col-span-2 md:col-span-2 col-start-11 md:col-start-auto text-right font-mono mt-1 md:mt-0">
+                            <div className="col-span-3 md:col-span-2 col-start-10 md:col-start-auto text-right font-mono mt-1 md:mt-0">
                                 {isIncluded ? (
                                     <span className="text-[#D4F846] text-[10px] md:text-xs uppercase tracking-wider border border-[#D4F846]/30 bg-[#D4F846]/10 px-2 py-1">
                                         Included
