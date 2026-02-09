@@ -339,6 +339,15 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
   const isFullPayment = data.payment_mode === 'full';
   const [isLoading, setIsLoading] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowStickyBar(window.scrollY > 600);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // === ROADMAP LOGIC ===
   const getProductionProgress = () => {
@@ -1007,6 +1016,38 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
         </section>
 
       </motion.div>
+
+      {/* MOBILE STICKY ACTION BAR */}
+      <AnimatePresence>
+        {showStickyBar && !isExpired && mode !== 'order' && (
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed bottom-0 left-0 right-0 z-[60] md:hidden bg-white/80 dark:bg-[#111]/80 backdrop-blur-lg border-t border-gray-200 dark:border-[#333] px-6 py-4 pb-8 shadow-2xl"
+          >
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col">
+                    <span className="text-[10px] text-gray-500 dark:text-[#666] font-mono uppercase tracking-wider">
+                        {isFullPayment ? 'Total Due' : 'Deposit'}
+                    </span>
+                    <span className="text-xl font-mono text-black dark:text-[#EDEDED]">
+                        {formatCurrency(data.aanbetaling, data.valuta)}
+                    </span>
+                </div>
+                <button
+                    onClick={handlePayment}
+                    disabled={isLoading}
+                    className="bg-[#D4F846] text-black px-6 py-3 font-bold uppercase text-xs tracking-widest hover:bg-white transition-colors disabled:opacity-70 flex items-center gap-2 shadow-lg shadow-[#D4F846]/20"
+                >
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (isFullPayment ? 'Pay Now' : 'Secure Build')}
+                    {!isLoading && <ArrowRight className="w-4 h-4" />}
+                </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
        {/* Footer Anchor */}
        <footer className="bg-gray-50 dark:bg-black border-t border-gray-200 dark:border-[#222] py-16 transition-colors duration-300">
