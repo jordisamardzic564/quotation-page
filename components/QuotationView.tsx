@@ -700,8 +700,8 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
         {/* Configuration List - Single List Preserving Order */}
         <section className="mb-32">
             <div className="flex items-end justify-between mb-8 border-b border-gray-200 dark:border-[#333] pb-4">
-                <h2 className="uppercase tracking-wide text-black dark:text-white" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, fontSize: '34px', marginTop: 0, marginBottom: 0 }}>Build Configuration</h2>
-                <span className="font-mono text-gray-500 dark:text-[#666] text-xs">REF: {data.name}</span>
+                <h2 className="uppercase tracking-wide text-black dark:text-white text-2xl md:text-[34px]" style={{ fontFamily: 'Ppmonumentextended, sans-serif', fontWeight: 400, marginTop: 0, marginBottom: 0 }}>Build Configuration</h2>
+                <span className="font-mono text-gray-500 dark:text-[#666] text-[10px] md:text-xs">REF: {data.name}</span>
             </div>
 
             <motion.div 
@@ -727,35 +727,35 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                       <motion.div
                         key={product.product_id}
                         variants={itemVariants}
-                        className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-8 border-b border-gray-200 dark:border-[#333] hover:border-[#D4F846] transition-colors relative"
+                        className="group grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-4 py-6 md:py-8 border-b border-gray-200 dark:border-[#333] hover:border-[#D4F846] transition-colors relative"
                       >
                         <div className="absolute inset-0 bg-[#D4F846] opacity-0 group-hover:opacity-[0.02] transition-opacity pointer-events-none" />
 
-                        <div className="col-span-12 md:col-span-2 font-mono text-[#D4F846] text-xs">
+                        <div className="col-span-12 md:col-span-2 font-mono text-[#D4F846] text-[10px] md:text-xs mb-1 md:mb-0">
                           {product.parsed.code || "WHEEL-SET"}
                         </div>
                         <div className="col-span-12 md:col-span-6">
                           <h3
-                            className="text-xl font-bold uppercase mb-2 text-black dark:text-white"
+                            className="text-sm md:text-xl font-bold uppercase mb-1 md:mb-2 text-black dark:text-white leading-tight"
                             style={{ fontFamily: "Ppmonumentextended, sans-serif" }}
                           >
                             {product.parsed.title}
                           </h3>
-                          <p className="text-gray-600 dark:text-[#888] text-sm leading-relaxed">
+                          <p className="text-gray-600 dark:text-[#888] text-xs md:text-sm leading-relaxed">
                             {product.parsed.description}
                           </p>
                           {product.concaveProfile && (
-                            <div className="flex gap-4 mt-4">
-                              <span className="text-xs font-mono bg-gray-50 dark:bg-[#0f0f0f] px-3 py-1 border border-gray-200 dark:border-[#333] text-[#D4F846] uppercase tracking-wider">
+                            <div className="flex gap-4 mt-2 md:mt-4">
+                              <span className="text-[10px] md:text-xs font-mono bg-gray-50 dark:bg-[#0f0f0f] px-2 md:px-3 py-1 border border-gray-200 dark:border-[#333] text-[#D4F846] uppercase tracking-wider">
                                 {product.concaveProfile} Concave
                               </span>
                             </div>
                           )}
                         </div>
-                        <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] flex items-start justify-end">
+                        <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] flex items-start justify-end text-xs md:text-base mt-2 md:mt-0">
                           {product.quantity}
                         </div>
-                        <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] text-lg">
+                        <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] text-sm md:text-lg mt-2 md:mt-0">
                           {formatCurrency(product.prijs_per_stuk, data.valuta)}
                         </div>
                       </motion.div>
@@ -767,30 +767,30 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                         <motion.div 
                             key={product.product_id}
                             variants={itemVariants}
-                            className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-6 border-b border-gray-200 dark:border-[#333] hover:border-[#D4F846] transition-colors items-center relative"
+                            className="group grid grid-cols-1 md:grid-cols-12 gap-y-1 md:gap-4 py-4 md:py-6 border-b border-gray-200 dark:border-[#333] hover:border-[#D4F846] transition-colors items-center relative"
                         >
-                            <div className="col-span-12 md:col-span-2 font-mono text-gray-500 dark:text-[#666] text-xs group-hover:text-[#D4F846] transition-colors">
+                            <div className="col-span-12 md:col-span-2 font-mono text-gray-500 dark:text-[#666] text-[10px] md:text-xs group-hover:text-[#D4F846] transition-colors mb-1 md:mb-0">
                                 {product.parsed.code || 'ENG-OPT'}
                             </div>
                             <div className="col-span-12 md:col-span-6">
                                 <h4
-                                  className="font-bold text-sm uppercase mb-1 text-black dark:text-white"
+                                  className="font-bold text-xs md:text-sm uppercase mb-0.5 md:mb-1 text-black dark:text-white leading-tight"
                                   style={{ fontFamily: 'Ppmonumentextended, sans-serif' }}
                                 >
                                   {product.parsed.title}
                                 </h4>
-                                <p className="text-gray-500 dark:text-[#666] text-xs font-mono">{product.parsed.description}</p>
+                                <p className="text-gray-500 dark:text-[#666] text-[10px] md:text-xs font-mono leading-tight">{product.parsed.description}</p>
                             </div>
-                            <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] text-sm">
+                            <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] text-xs md:text-sm mt-1 md:mt-0">
                                 {product.quantity}
                             </div>
-                            <div className="col-span-6 md:col-span-2 text-right font-mono">
+                            <div className="col-span-6 md:col-span-2 text-right font-mono mt-1 md:mt-0">
                                 {isIncluded ? (
-                                    <span className="text-[#D4F846] text-xs uppercase tracking-wider border border-[#D4F846]/30 bg-[#D4F846]/10 px-2 py-1">
+                                    <span className="text-[#D4F846] text-[10px] md:text-xs uppercase tracking-wider border border-[#D4F846]/30 bg-[#D4F846]/10 px-2 py-1">
                                         Included
                                     </span>
                                 ) : (
-                                    <span className="text-black dark:text-[#EDEDED]">{formatCurrency(product.prijs_per_stuk, data.valuta)}</span>
+                                    <span className="text-black dark:text-[#EDEDED] text-xs md:text-base">{formatCurrency(product.prijs_per_stuk, data.valuta)}</span>
                                 )}
                             </div>
                         </motion.div>
