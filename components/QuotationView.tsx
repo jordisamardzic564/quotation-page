@@ -727,7 +727,7 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                       <motion.div
                         key={product.product_id}
                         variants={itemVariants}
-                        className="group grid grid-cols-1 md:grid-cols-12 gap-y-2 md:gap-4 py-6 md:py-8 border-b border-gray-200 dark:border-[#333] hover:border-[#D4F846] transition-colors relative"
+                        className="group grid grid-cols-12 gap-y-2 md:gap-4 py-6 md:py-8 border-b border-gray-200 dark:border-[#333] hover:border-[#D4F846] transition-colors relative"
                       >
                         <div className="absolute inset-0 bg-[#D4F846] opacity-0 group-hover:opacity-[0.02] transition-opacity pointer-events-none" />
 
@@ -752,10 +752,10 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                             </div>
                           )}
                         </div>
-                        <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] flex items-start justify-end text-xs md:text-base mt-2 md:mt-0">
+                        <div className="col-span-2 md:col-span-2 col-start-9 md:col-start-auto text-right font-mono text-black dark:text-[#EDEDED] flex items-start justify-end text-xs md:text-base mt-2 md:mt-0">
                           {product.quantity}
                         </div>
-                        <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] text-sm md:text-lg mt-2 md:mt-0">
+                        <div className="col-span-2 md:col-span-2 col-start-11 md:col-start-auto text-right font-mono text-black dark:text-[#EDEDED] text-sm md:text-lg mt-2 md:mt-0">
                           {formatCurrency(product.prijs_per_stuk, data.valuta)}
                         </div>
                       </motion.div>
@@ -767,7 +767,7 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                         <motion.div 
                             key={product.product_id}
                             variants={itemVariants}
-                            className="group grid grid-cols-1 md:grid-cols-12 gap-y-1 md:gap-4 py-4 md:py-6 border-b border-gray-200 dark:border-[#333] hover:border-[#D4F846] transition-colors items-center relative"
+                            className="group grid grid-cols-12 gap-y-1 md:gap-4 py-4 md:py-6 border-b border-gray-200 dark:border-[#333] hover:border-[#D4F846] transition-colors items-center relative"
                         >
                             <div className="col-span-12 md:col-span-2 font-mono text-gray-500 dark:text-[#666] text-[10px] md:text-xs group-hover:text-[#D4F846] transition-colors mb-1 md:mb-0">
                                 {product.parsed.code || 'ENG-OPT'}
@@ -781,10 +781,10 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
                                 </h4>
                                 <p className="text-gray-500 dark:text-[#666] text-[10px] md:text-xs font-mono leading-tight">{product.parsed.description}</p>
                             </div>
-                            <div className="col-span-6 md:col-span-2 text-right font-mono text-black dark:text-[#EDEDED] text-xs md:text-sm mt-1 md:mt-0">
+                            <div className="col-span-2 md:col-span-2 col-start-9 md:col-start-auto text-right font-mono text-black dark:text-[#EDEDED] text-xs md:text-sm mt-1 md:mt-0">
                                 {product.quantity}
                             </div>
-                            <div className="col-span-6 md:col-span-2 text-right font-mono mt-1 md:mt-0">
+                            <div className="col-span-2 md:col-span-2 col-start-11 md:col-start-auto text-right font-mono mt-1 md:mt-0">
                                 {isIncluded ? (
                                     <span className="text-[#D4F846] text-[10px] md:text-xs uppercase tracking-wider border border-[#D4F846]/30 bg-[#D4F846]/10 px-2 py-1">
                                         Included
