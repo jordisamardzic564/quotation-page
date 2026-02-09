@@ -148,8 +148,15 @@ export default function QuotationView({ data, mode = 'quotation' }: QuotationVie
   // We verwerken de productenlijst één keer om te bepalen wat velgen zijn en wat niet.
   // We behouden de originele volgorde van Odoo voor de weergave in de tabel.
   const { enrichedProducts, wheelProducts } = useMemo(() => {
+    // Filter aanbetalingen eruit voordat we iets anders doen
+    const filteredRawProducts = data.producten.filter(p => {
+      const name = p.product_naam.toLowerCase();
+      // Filter regels die 'aanbetaling', 'down payment' of 'deposit' bevatten
+      return !name.includes('aanbetaling') && !name.includes('down payment') && !name.includes('deposit');
+    });
+
     // 1. Identificeer velgen en parse data
-    const tempProducts = data.producten.map(p => ({
+    const tempProducts = filteredRawProducts.map(p => ({
       ...p,
       isWheel: isWheelProduct(p),
       parsed: parseProduct(p)
